@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print('Title: ${message.notification?.title}');
@@ -8,6 +9,8 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 }
 
 class FirebaseApi {
+  final storage = FlutterSecureStorage();
+  final securedDesignation = "designation";
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -23,19 +26,28 @@ class FirebaseApi {
     // Subscribe to a topic
     await _firebaseMessaging.subscribeToTopic('mechanics');
 
+    final designation = await storage.read(key: securedDesignation);
+    print("designation: $designation");
+
     // Handle background messages
-    FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+    if(designation == "Mechanic"  || designation == "Admin Officer") {
+      FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+    }
+
 
     // Initialize local notifications for foreground handling
-    _initializeLocalNotifications();
+
+      _initializeLocalNotifications();
 
     // Listen to foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Message received in foreground: ${message.notification?.title}');
-      _showNotification(
-        message.notification?.title,
-        message.notification?.body,
-      );
+      if(designation == "Mechanic"  || designation == "Admin Officer") {
+        _showNotification(
+          message.notification?.title,
+          message.notification?.body,
+        );
+      }
     });
   }
 

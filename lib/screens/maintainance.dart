@@ -121,7 +121,7 @@ Future<List> fetchMachines() async {
   final response = await http.get(url);
   if (response.statusCode == 200) {
     print(response.body);
-    final data = jsonDecode(response.body)["results"];
+    final data = jsonDecode(response.body);
     print(data);
     return data;
   } else {

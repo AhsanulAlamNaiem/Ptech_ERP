@@ -82,10 +82,16 @@ class _MachineScannerPageState extends State<MachineScanner> {
 
     final headers = {'Content-Type': 'application/json'};
     final response = await http.get(url);
-    final designatione =
-        await storage.read(key: securedDesignation) ?? "Unknown";
+
+    print(response.statusCode);
+
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      List<dynamic> jsonDecodedData = jsonDecode(response.body);
+      print("Json data: $jsonDecodedData");
+      Map machineObject = jsonDecodedData[0];
+      print("machine Object: $machineObject");
+      return machineObject;
+
     }
     return null;
   }
@@ -94,6 +100,8 @@ class _MachineScannerPageState extends State<MachineScanner> {
     return FutureBuilder(
       future: funcFetchMachineDetails(model),
       builder: (context, snapshot) {
+        print(snapshot.hasData);
+        print(snapshot.data);
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
               child: Column(
@@ -189,7 +197,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final machine = widget.machineDetails['results'][0];
+    final machine = widget.machineDetails;
     final statuses = ['active', 'inactive', 'maintenance', 'broken'];
     final problemCategory = [
       'Problem Cat 1',
