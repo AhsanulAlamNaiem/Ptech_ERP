@@ -155,9 +155,17 @@ class MachineDetailsPage extends StatefulWidget {
 
 class _MachineDetailsPageState extends State<MachineDetailsPage> {
   bool isPatching = false;
+
   int selectedCategoryIndex = -1;
   String? selectedCategory;
   List<dynamic> problemCategories = [];
+
+  int selectedSubCategoryIndex = -1;
+  dynamic selectedSubCategory;
+  List<dynamic> subCategories = [];
+  dynamic strSelectedSubCategory;
+
+
   bool isFetchingProblemCategory = true;
   String? successMessage;
 
@@ -167,6 +175,14 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
     final designation = await storage.read(key: securedDesignation);
 
     return designation;
+  }
+
+  void onCategoryChange(int categoryId) {
+    setState(() {
+      subCategories = problemCategories[categoryId-1]['categories'];
+      print("Selected Subcategories: $subCategories");
+      selectedSubCategory = null; // Reset subcategory selection
+    });
   }
 
   @override
@@ -180,7 +196,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
 
   Future<void> fetchProblemCategories() async {
     final String apiUrl =
-        "https://machine-maintenance.onrender.com/api/maintenance/problem-category/"; // Replace with your API URL
+        "https://machine-maintenance.ddns.net/api/maintenance/problem-category-type/"; // Replace with your API URL
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
@@ -199,18 +215,6 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
   Widget build(BuildContext context) {
     final machine = widget.machineDetails;
     final statuses = ['active', 'inactive', 'maintenance', 'broken'];
-    final problemCategory = [
-      'Problem Cat 1',
-      'Problem Cat 2',
-      'Problem Cat 3',
-      'Problem Cat 4'
-    ];
-    final designations = [
-      'Mechanic',
-      'Supervisor',
-      'Operator',
-      'Admin Officer'
-    ];
     String lastProblem = "";
 
     return FutureBuilder(
@@ -242,15 +246,61 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                   Text("Your Role: $designation"),
                   const Text("Is the machine broken?"),
                   SizedBox(height: 16),
-                  TextField(
-                    decoration: InputDecoration(
-                        hintText: '',
-                        border: OutlineInputBorder(),
-                        labelText: "Explain the problem:"),
-                    onChanged: (value) {
-                      lastProblem = value;
+
+
+
+
+
+                  problemCategories.isEmpty
+                      ? const CircularProgressIndicator()
+                      : DropdownButton<String>(
+                    value: selectedCategory,
+                    hint: const Text("Select Problem Category"),
+                    isExpanded: true,
+                    items: problemCategories.map((category) {
+                      return DropdownMenuItem<String>(
+                        value: category['id'].toString(),
+                        child: Text(category['name']),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedCategory = newValue;
+                        selectedCategoryIndex = int.parse(newValue!);
+                      });
+                      onCategoryChange(selectedCategoryIndex);
                     },
                   ),
+                  const SizedBox(height: 16.0),
+
+                  DropdownButton<String>(
+                    value: selectedSubCategory,
+                    hint: const Text("Select Subcategory"),
+                    isExpanded: true,
+                    items: subCategories.map((subCategory) {
+                      return DropdownMenuItem<String>(
+                        value: subCategory['id'].toString(),
+                        child: Text(subCategory['name']),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedSubCategory = newValue;
+                        selectedSubCategoryIndex = int.parse(newValue!);
+                        strSelectedSubCategory = subCategories.firstWhere((item)=>item['id']==selectedSubCategoryIndex)['name'];
+                        print(strSelectedSubCategory);
+                      });
+                    },
+                  ),
+                  const Spacer(),
+
+
+
+
+
+
+
+
                   SizedBox(height: 16),
                   isPatching
                       ? CircularProgressIndicator()
@@ -270,7 +320,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                           "T" +
                                           currentTIme.split(" ")[1] +
                                           "Z",
-                                  "last_problem": lastProblem
+                                  "last_problem": strSelectedSubCategory
                                 };
 
                                 print(body);
@@ -288,27 +338,47 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                   const SizedBox(height: 16.0),
 
                   problemCategories.isEmpty
-                      ? CircularProgressIndicator()
-                      : successMessage != null
-                          ? Text("$successMessage")
-                          : DropdownButton<String>(
-                              value: selectedCategory,
-                              hint: Text("Selected Problem Category:"),
-                              items: problemCategories.map((category) {
-                                return DropdownMenuItem<String>(
-                                  value: category['id'].toString(),
-                                  child: Text(category['name']),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedCategory = newValue;
-                                  selectedCategoryIndex = int.parse(newValue!);
-                                  print(selectedCategoryIndex);
-                                });
-                              },
-                            ),
+                      ? const CircularProgressIndicator()
+                      : DropdownButton<String>(
+                    value: selectedCategory,
+                    hint: const Text("Select Problem Category"),
+                    isExpanded: true,
+                    items: problemCategories.map((category) {
+                      return DropdownMenuItem<String>(
+                        value: category['id'].toString(),
+                        child: Text(category['name']),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedCategory = newValue;
+                        selectedCategoryIndex = int.parse(newValue!);
+                      });
+                      onCategoryChange(selectedCategoryIndex);
+                    },
+                  ),
                   const SizedBox(height: 16.0),
+
+                  DropdownButton<String>(
+                    value: selectedSubCategory,
+                    hint: const Text("Select Subcategory"),
+                    isExpanded: true,
+                    items: subCategories.map((subCategory) {
+                      return DropdownMenuItem<String>(
+                        value: subCategory['id'].toString(),
+                        child: Text(subCategory['name']),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        print(newValue);
+                        selectedSubCategory = newValue;
+                        selectedSubCategoryIndex = int.parse(newValue!);
+                        print(selectedSubCategoryIndex);
+                      });
+                    },
+                  ),
+                  const Spacer(),
 
                   isPatching
                       ? CircularProgressIndicator()
@@ -354,7 +424,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                   "machine": "${machine['id']}",
                                   "mechanic": "",
                                   "operator": "",
-                                  "problem_category": "$selectedCategoryIndex",
+                                  "problem_category": "$selectedSubCategoryIndex",
                                   "location": "1",
                                   "line": "${machine['line']}",
                                 };
@@ -403,6 +473,8 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                   Text("Your Role: $designation"),
                   const Text("Change machine status to:"),
                   const SizedBox(height: 16.0),
+
+
                   DropdownButton<String>(
                     value: machineStatus,
                     items: statuses.map((status) {
