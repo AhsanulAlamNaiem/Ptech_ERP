@@ -4,6 +4,8 @@ import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'appTheme.dart';
+
 class LogInPage extends StatefulWidget {
   const LogInPage({super.key});
 
@@ -22,6 +24,9 @@ class _LogInPageState extends State<LogInPage> {
   final securedDesignation = "designation";
   final securedDepartment = "dept";
   final securedCompany = 'company';
+
+  final TextEditingController passwordController = TextEditingController();
+  bool _obscurePassword = true; // This controls password visibility
 
   Future<void> login() async {
     setState(() {
@@ -116,26 +121,52 @@ class _LogInPageState extends State<LogInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("PPC ERP"),
-        ),
+        appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80), // Adjust the height as needed
+    child: ClipRRect(
+    borderRadius: BorderRadius.only(
+    bottomLeft: Radius.circular(15), // Bottom left corner rounded
+    bottomRight: Radius.circular(15), // Bottom right corner rounded
+    ),
+    child: AppBar(
+          backgroundColor: AppColors.mainColor,
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+            SizedBox(height: 26.0),
+            Text("Ptech ERP", style: AppStyles.textOnMainColorheading,)
+          ]
+          ),
+          centerTitle: true,
+        ))),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
+          padding: const EdgeInsets.fromLTRB(16.0,40,16,0),
+          child: Column( children: [ Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+
             children: [
               TextField(
                 decoration: InputDecoration(
-                    hintText: '',
+                  prefixIcon: Icon(Icons.email),
+                    hintText: 'Enter your Email',
                     border: OutlineInputBorder(),
-                    labelText: "Username:"),
+                    labelText: "Email"),
                 onChanged: (value) {
                   email = value;
                 },
               ),
               SizedBox(height: 20),
               TextField(
+                obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                    hintText: '',
+                  prefixIcon: Icon(Icons.lock),
+                    suffixIcon: IconButton(onPressed: (){
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+
+                    }, icon: Icon(_obscurePassword? Icons.visibility:Icons.visibility_off)),
+                    hintText: 'Enter Password',
                     border: OutlineInputBorder(),
                     labelText: "Password"),
                 onChanged: (value) {
@@ -146,18 +177,33 @@ class _LogInPageState extends State<LogInPage> {
               isLoading
                   ? CircularProgressIndicator()
                   : ElevatedButton(
+                    style: AppStyles.elevatedButtonStyle,
                       onPressed: () {
                         login();
                       },
                       child: Text("Login")),
-              ElevatedButton(
-                  onPressed: () async {
-                    final value = await storage.read(key: securedKey);
-                    print("$securedKey : $value");
-                  },
-                  child: Text("read Secure data"))
+              TextButton(
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                        EdgeInsets.all(0)),
+                  ),
+                  onPressed: (){}, child: Text("Forget Password?")),
+
+
+              // ElevatedButton(
+              //     style: AppStyles.elevatedButtonStyle,
+              //     onPressed: () async {
+              //       final value = await storage.read(key: securedKey);
+              //       print("$securedKey : $value");
+              //     },
+              //     child: Text("read Secure data"))
+
             ],
           ),
+            Spacer(),
+            Image.asset('assets/images/panaceaLogo.png',
+                width: 60, height: 60,fit: BoxFit.cover),
+            Text("Ptech ERP - Panacea Private Consulting")])
         ));
   }
 }
