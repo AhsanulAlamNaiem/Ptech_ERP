@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ptech_erp/appResources.dart';
 import 'package:ptech_erp/login_page.dart';
 import 'package:ptech_erp/screens/inventory.dart';
 import 'package:ptech_erp/screens/production.dart';
@@ -37,8 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget homeScreenBuilder(Map user) {
     Widget funcHomeBuilder() {
-      return Center(
-        child: Column(children: [
+      return Padding(
+          padding: EdgeInsets.fromLTRB(16, 30, 16, 3),
+        child:  Column(children: [
           Btn("Production", ProductionPage()),
           Btn("Maintenance", Maintanance()),
           Btn("Inventory", InventoryPage()),
@@ -55,8 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
               },
               child: Text("change designation"))
-        ]),
-      );
+        ]));
     }
 
     final List<Widget> pages = [
@@ -74,11 +75,25 @@ class _HomeScreenState extends State<HomeScreen> {
           return shouldAllowPop; // Block back navigation
         },
         child: Scaffold(
-          appBar: AppBar(
-            leading: null,
-            // leading: Text("what?"),
-            title: Text(" Home "),
+          appBar: PreferredSize(
+        preferredSize: Size.fromHeight(150), // Adjust the height as needed
+        child: ClipRRect(
+        borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(15), // Bottom left corner rounded
+        bottomRight: Radius.circular(15), // Bottom right corner rounded
+        ),
+        child: AppBar(
+          backgroundColor: AppColors.mainColor,
+          title: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Image.asset('assets/images/logowhite.png',
+                    width: 60, height: 60,fit: BoxFit.cover),
+                Text("Ptech ERP", style: AppStyles.textOnMainColorheading,)
+              ]
           ),
+          centerTitle: true,
+        ))),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
             selectedItemColor: Colors.green,
@@ -150,11 +165,42 @@ class Btn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return Container(
+        margin: EdgeInsets.fromLTRB(0,10,0,10), // Add margin around the button
+    child: ElevatedButton(
+        style: AppStyles.homePageBUttonStyle,
         onPressed: () {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => screen));
         },
-        child: Text(title));
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.mainColor, // White background for the icon
+                  shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                padding: EdgeInsets.all(7),
+                child: Icon(Icons.stacked_bar_chart_outlined,
+                    color: Colors.white,
+                size:40),
+              ),
+              SizedBox(width: 8),
+              Text(title,
+                  style: TextStyle(
+                    color: Colors.black, // Text color
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20
+                  ))
+            ]
+        )
+        ]
+        )
+    ));
   }
 }

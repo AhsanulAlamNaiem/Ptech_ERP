@@ -5,6 +5,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../appResources.dart';
+
 class MachineScanner extends StatefulWidget {
   const MachineScanner({super.key});
 
@@ -34,30 +36,6 @@ class _MachineScannerPageState extends State<MachineScanner> {
                   Vibration.vibrate();
                   isScanning = !isScanning;
                 });
-
-                // if(!isScanned){
-                //
-                //   Vibration.vibrate();
-                //   bool? result = await showDialog(
-                //     context: context,
-                //     barrierDismissible: false,
-                //     builder: (BuildContext context){
-                //       return AlertDialog(
-                //         title: Text("Model: ${capture.barcodes[0].rawValue}"),
-                //         content: Text("Machine description is here"),
-                //         actions: [
-                //           ElevatedButton(onPressed: (){}, child: Text("Yes")),
-                //           ElevatedButton(onPressed: (){
-                //             Navigator.of(context).pop(false);
-                //             }, child: Text("Cancel"))
-                //         ],
-                //       );
-                //     }
-                // );
-                //   print(result);
-                //   result!? isScanned =  false: isScanned =false;
-                //
-                // };
               }
             },
           ),
@@ -77,8 +55,11 @@ class _MachineScannerPageState extends State<MachineScanner> {
   }
 
   Future<Map?> funcFetchMachineDetails(String model) async {
-    final url = Uri.parse(
-        "https://machine-maintenance.ddns.net/api/maintenance/machines/?machine_id=$model");
+    final queryParams = {
+      'machine_id': '$model'
+    };
+    final url = Uri.parse(AppApis.Machines).replace(queryParameters: queryParams);
+    print(url);
 
     final headers = {'Content-Type': 'application/json'};
     final response = await http.get(url);
@@ -195,10 +176,9 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
   }
 
   Future<void> fetchProblemCategories() async {
-    final String apiUrl =
-        "https://machine-maintenance.ddns.net/api/maintenance/problem-category-type/"; // Replace with your API URL
+
     try {
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await http.get(Uri.parse(AppApis.getProblemCategory));
       if (response.statusCode == 200) {
         setState(() {
           problemCategories = json.decode(response.body);
@@ -504,26 +484,23 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
       required Map body,
       Map breakdownBody = const {},
       bool willUpdateBreakdown = false}) async {
-    final url =
-        "https://machine-maintenance.ddns.net/api/maintenance/machines/$machineId/";
-    final breakDownUrl =
-        "https://machine-maintenance.ddns.net/api/maintenance/breakdown-logs/";
+
 
     setState(() {
       isPatching = true;
     });
 
+
     try {
-      final response = await http.patch(
-        Uri.parse(url),
-        body: body,
-      );
+      final url = Uri.parse(AppApis.Machines + "${machineId}/");
+      print(url);
+      final response = await http.patch(url,body: body);
       print(response.body);
       print("Status updated to $body");
 
       if (willUpdateBreakdown) {
         final patchResponse =
-            await http.post(Uri.parse(breakDownUrl), body: breakdownBody);
+            await http.post(Uri.parse(AppApis.BreakDownLogs), body: breakdownBody);
         print(breakdownBody);
         print("Breakdown updated ${patchResponse.body}");
         // Show success message

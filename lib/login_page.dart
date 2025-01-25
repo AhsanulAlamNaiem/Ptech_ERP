@@ -4,7 +4,7 @@ import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'appTheme.dart';
+import 'appResources.dart';
 
 class LogInPage extends StatefulWidget {
   const LogInPage({super.key});
@@ -32,9 +32,7 @@ class _LogInPageState extends State<LogInPage> {
     setState(() {
       isLoading = true;
     });
-    final url = Uri.parse(
-        "https://machine-maintenance.ddns.net/api/user_management/login/");
-    //https://ppcinern.pythonanywhere.com/login
+    final url = Uri.parse(AppApis.login);
     final body = jsonEncode({"email": email, "password": password});
 
     final headers = {'Content-Type': 'application/json'};
@@ -48,8 +46,7 @@ class _LogInPageState extends State<LogInPage> {
       final cookie = "${cookies[0]}; ${cookies[4].split(",")[1]}";
 
       if (token != null) {
-        final employeUrl = Uri.parse(
-            "https://machine-maintenance.ddns.net/api/user_management/employee-details/");
+        final employeUrl = Uri.parse(AppApis.employeeDetails);
         final headers = {"cookie": cookie, "Authorization": "Token $token"};
 
         print(headers);
@@ -188,7 +185,6 @@ class _LogInPageState extends State<LogInPage> {
                         EdgeInsets.all(0)),
                   ),
                   onPressed: (){}, child: Text("Forget Password?")),
-
 
               // ElevatedButton(
               //     style: AppStyles.elevatedButtonStyle,
