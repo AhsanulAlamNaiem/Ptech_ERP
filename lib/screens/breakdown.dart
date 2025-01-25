@@ -45,7 +45,7 @@ class _BreakdownPageState extends State<BreakdownPage> {
 
   Future<List> fetchMachines() async {
     final url = Uri.parse(
-        "https://machine-maintenance.onrender.com/api/maintenance/breakdown-logs/");
+        "https://machine-maintenance.ddns.net/api/maintenance/breakdown-logs/");
 
     final response = await http.get(url);
     if (response.statusCode == 200) {

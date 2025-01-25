@@ -33,7 +33,7 @@ class _LogInPageState extends State<LogInPage> {
       isLoading = true;
     });
     final url = Uri.parse(
-        "https://machine-maintenance.onrender.com/api/user_management/login/");
+        "https://machine-maintenance.ddns.net/api/user_management/login/");
     //https://ppcinern.pythonanywhere.com/login
     final body = jsonEncode({"email": email, "password": password});
 
@@ -49,7 +49,7 @@ class _LogInPageState extends State<LogInPage> {
 
       if (token != null) {
         final employeUrl = Uri.parse(
-            "https://machine-maintenance.onrender.com/api/user_management/employee-details/");
+            "https://machine-maintenance.ddns.net/api/user_management/employee-details/");
         final headers = {"cookie": cookie, "Authorization": "Token $token"};
 
         print(headers);

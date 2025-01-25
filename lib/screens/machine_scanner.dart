@@ -78,7 +78,7 @@ class _MachineScannerPageState extends State<MachineScanner> {
 
   Future<Map?> funcFetchMachineDetails(String model) async {
     final url = Uri.parse(
-        "https://machine-maintenance.onrender.com/api/maintenance/machines/?machine_id=$model");
+        "https://machine-maintenance.ddns.net/api/maintenance/machines/?machine_id=$model");
 
     final headers = {'Content-Type': 'application/json'};
     final response = await http.get(url);
@@ -505,9 +505,9 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
       Map breakdownBody = const {},
       bool willUpdateBreakdown = false}) async {
     final url =
-        "https://machine-maintenance.onrender.com/api/maintenance/machines/$machineId/";
+        "https://machine-maintenance.ddns.net/api/maintenance/machines/$machineId/";
     final breakDownUrl =
-        "https://machine-maintenance.onrender.com/api/maintenance/breakdown-logs/";
+        "https://machine-maintenance.ddns.net/api/maintenance/breakdown-logs/";
 
     setState(() {
       isPatching = true;

@@ -3,7 +3,7 @@ import 'dart:io';
 void main() async {
   // Define the source file and destination file paths
   String sourceFilePath = './build/app/outputs/flutter-apk/app-release.apk'; // Replace with your source file path
-  String destinationFilePath = './apk/app-release.apk'; // Replace with your destination file path
+  String destinationFilePath = './apk/Ptech ERP.apk'; // Replace with your destination file path
 
   try {
     // Create File objects for source and destination
