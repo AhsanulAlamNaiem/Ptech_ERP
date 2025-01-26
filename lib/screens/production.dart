@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptech_erp/appResources.dart';
 
 
 class ProductionPage extends StatefulWidget {
@@ -12,8 +13,8 @@ class _ProductionPageState extends State<ProductionPage>{
   @override
   Widget build(BuildContext context) {
     return       Scaffold(
-        appBar: AppBar(
-          title: Text("Production"),
+        appBar: customAppBar(
+          title: "Production",
 
           leading: IconButton(
               onPressed: () {

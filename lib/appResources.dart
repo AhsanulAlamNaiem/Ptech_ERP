@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color mainColor = Color(0xFFEE1B22);
-  static const Color accentColor = Color(0xFF42A5F5);
+  static const Color accentColor = Color(0x88EE1B22);
   static const Color fontColorBlack = Colors.black;
-  static const Color fontColorGray = Color(0xFFDCDCDC);
+  static const Color fontColorGray = Color(0xFF5555555);
   static const Color disabledMainColor = Color(0xFFFFE8E8);
   static const Color textColorOnMainColor = Color(0xFFFFFFFF);
 
@@ -26,9 +26,38 @@ class AppStyles {
   color: AppColors.textColorOnMainColor,
   );
 
-  static const TextStyle bodyText = TextStyle(
+  static const TextStyle textH2 = TextStyle(
   fontSize: 16.0,
-  color: AppColors.textColorOnMainColor,
+  color: Colors.black,
+    fontWeight: FontWeight.bold
+  );
+  static const TextStyle textH3 = TextStyle(
+      fontSize: 14.0,
+      color: Colors.black,
+      fontWeight: FontWeight.bold
+  );
+  static const TextStyle textH4 = TextStyle(
+      fontSize: 12.0,
+      color: Colors.black,
+      fontWeight: FontWeight.bold
+  );
+
+  static const TextStyle bodyText = TextStyle(
+      fontSize: 11.0,
+      color: Colors.black,
+      fontWeight: FontWeight.normal
+  );
+
+  static const TextStyle bodyTextgray = TextStyle(
+      fontSize: 11.0,
+      color: AppColors.fontColorGray,
+      fontWeight: FontWeight.normal
+  );
+
+  static const TextStyle bodyTextBold = TextStyle(
+      fontSize: 11.0,
+      color: Colors.black,
+      fontWeight: FontWeight.bold
   );
 
   static const TextStyle buttonText = TextStyle(
@@ -37,8 +66,12 @@ class AppStyles {
   color: AppColors.textColorOnMainColor,
   );
 
+  static ButtonStyle  textButtonWhite = TextButton.styleFrom(
+    textStyle: textH4
+  );
+
   // Button Styles
-  static ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
+  static ButtonStyle elevatedButtonStyleFullWidth = ElevatedButton.styleFrom(
   backgroundColor: AppColors.mainColor,
   textStyle: buttonText,
   shape: RoundedRectangleBorder(
@@ -48,6 +81,10 @@ class AppStyles {
   minimumSize: MaterialStateProperty.all(Size(double.infinity, 40)), // Set minimum width to full screen width
   );
 
+  static ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
+    backgroundColor: AppColors.mainColor,
+    textStyle: buttonText,
+  );
 
 
   static ButtonStyle homePageBUttonStyle = ElevatedButton.styleFrom(
@@ -61,7 +98,6 @@ class AppStyles {
   ).copyWith(
     minimumSize: MaterialStateProperty.all(Size(double.infinity, 80)), // Set minimum width to full screen width
   );
-
 
 
 
@@ -93,24 +129,27 @@ class AppApis{
   static const String getProblemCategory = 'https://machine-maintenance.ddns.net/api/maintenance/problem-category-type/';
 }
 
-class AppWidgets {
-  Widget customAppBar(String title) {
-    return PreferredSize(
-        preferredSize: Size.fromHeight(80), // Adjust the height as needed
-        child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(15), // Bottom left corner rounded
-              bottomRight: Radius.circular(15), // Bottom right corner rounded
+
+PreferredSize customAppBar({required String title, List<Widget>? action = null , Widget? leading = null}) {
+  return PreferredSize(
+      preferredSize: Size.fromHeight(50), // Adjust the height as needed
+      child: ClipRRect(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(15), // Bottom left corner rounded
+            bottomRight: Radius.circular(15), // Bottom right corner rounded
+          ),
+          child: AppBar(
+            iconTheme: const IconThemeData(color:Colors.white),
+            backgroundColor: AppColors.mainColor,
+            title: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // SizedBox(height: 20,),
+                  Text(title, style: AppStyles.textOnMainColorheading,)
+                ]
             ),
-            child: AppBar(
-              backgroundColor: AppColors.mainColor,
-              title: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(title, style: AppStyles.textOnMainColorheading,)
-                  ]
-              ),
-              centerTitle: true,
-            )));
-  }
+            centerTitle: true,
+            leading: leading,
+            actions: action,
+          )));
 }

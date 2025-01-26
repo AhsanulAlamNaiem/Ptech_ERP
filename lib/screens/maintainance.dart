@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 
+import '../appResources.dart';
 import 'breakdown.dart';
 
 class Maintanance extends StatelessWidget {
@@ -13,15 +14,16 @@ class Maintanance extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text("Maintanance"),
+        appBar: customAppBar(
+          title: "Maintanance",
           leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(Icons.arrow_back)),
+              icon: Icon(Icons.arrow_back, color:Colors.white)),
         ),
-        body: Center(
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
           child: Column(
             children: [
               Btn("All Machines", AllMaintainances()),
@@ -39,27 +41,6 @@ class AllMaintainances extends StatefulWidget {
 
   @override
   _MachineListScreenState createState() => _MachineListScreenState();
-}
-
-class BreakdownLogs extends StatelessWidget {
-  const BreakdownLogs({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("BreakdownLogs"),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back)),
-      ),
-      body: Center(
-        child: ElevatedButton(onPressed: () {}, child: Text("")),
-      ),
-    );
-  }
 }
 
 class _MachineListScreenState extends State<AllMaintainances> {
@@ -82,17 +63,17 @@ class _MachineListScreenState extends State<AllMaintainances> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("All Machines"),
-        actions: [
-          IconButton(onPressed: _refreshData, icon: Icon(Icons.refresh))
-        ],
+      appBar: customAppBar(
+          title: "All Machines",
         leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back)),
-      ),
+          onPressed: () {
+    Navigator.pop(context);
+    },
+        icon: Icon(Icons.arrow_back)),
+          action: [
+            IconButton(onPressed: _refreshData, icon: Icon(Icons.refresh,))
+          ]
+    ),
       body: FutureBuilder<List>(
           future: fetchMachines(),
           builder: (context, snapshot) {
@@ -134,37 +115,65 @@ Widget funListViewBuilder({required List machines}) {
   return ListView.builder(
       itemCount: machines.length,
       itemBuilder: (context, index) {
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          color: Colors.white,
-          child: SizedBox(
-            height: 50,
-            width: double.infinity,
-            child: Container(
-              margin: EdgeInsets.only(left: 10),
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(5),
-              child: Column(
-                children: [
-                  Text(
-                    "${machines[index]['machine_id']}",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+        final status = machines[index]["status"];
+        bool isbroken = false;
+        bool isInRepair = false;
+        if(status=="broken"){ isbroken = true;} else if(status == "maintenance"){isInRepair==true;}
+
+        return Padding(
+            padding: EdgeInsets.fromLTRB(16, 1, 16, 1),
+            child: SizedBox(
+                    height: 120,
+                    width: double.infinity,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                          ),
+                      color: isbroken? AppColors.disabledMainColor: isInRepair? AppColors.accentColor : Colors.white,
+                      child:  Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    SizedBox(width: 10),
+                    Container(
+                      alignment: Alignment.center,
+                      height: 80,
+                      width: 60,
+                      decoration: BoxDecoration(
+                          color: isbroken? Colors.white: isInRepair? Colors.white : AppColors.disabledMainColor, // White background for the icon
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      padding: EdgeInsets.all(7),
+                      child: Text("${machines[index]["id"]}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
                     ),
-                  ),
-                  Text(
-                    "${machines[index]['status']}",
-                    style: TextStyle(
-                      color: Colors.grey,
+                    SizedBox(width: 8),
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                    Text("Id: ${machines[index]["machine_id"]}", style: AppStyles.textH2),
+                    Text("Model: ${machines[index]["model_number"]}", style: AppStyles.textH4),
+                    Text("Breakdown: ${machines[index]["last_breakdown_start"]}", style: AppStyles.bodyTextBold),
+                    Text("Last Problem: ${machines[index]["last_problem"]}", style: AppStyles.textH4),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                        Text("Line: ${machines[index]["line"]}", style: AppStyles.bodyTextBold),
+                        SizedBox(width: 20),
+                        Text("Operator: ${machines[index]["operator"]}", style: AppStyles.bodyTextBold)
+                      ]
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+                          // Text("${machines[index]["status"]}")
+
+                    ])
+                  ]
+              )
+              ]
+          ) ,
+        )));
       });
 }

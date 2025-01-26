@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../appResources.dart';
+
 class BreakdownPage extends StatefulWidget {
   const BreakdownPage({super.key});
 
@@ -11,31 +13,33 @@ class BreakdownPage extends StatefulWidget {
 }
 
 class _BreakdownPageState extends State<BreakdownPage> {
-  late Future<List<dynamic>> futureMachines;
+  late Future<List<dynamic>> futurelogs;
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Breakdown Logs"),
-        actions: [IconButton(onPressed: _refreshData, icon: Icon(Icons.refresh))],
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back)),
+      appBar: customAppBar(
+          title: "Brekdown Logs",
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.arrow_back)),
+          action: [
+            IconButton(onPressed: _refreshData, icon: Icon(Icons.refresh,))
+          ]
       ),
       body: FutureBuilder<List>(
-          future: fetchMachines(),
+          future: fetchlogs(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text("Something went wrong, Make sure this device have internet connection. \n\n\nError: \n\n${snapshot.error}"));
             } else if (snapshot.hasData) {
-              List machines = snapshot.data!;
-              return RefreshIndicator(onRefresh:_refreshData ,child: funListViewBuilder(machines: machines));
+              List logs = snapshot.data!;
+              return RefreshIndicator(onRefresh:_refreshData ,child: funListViewBuilder(logs: logs));
             }
             return Center(child: Text('No data available'));
           }),
@@ -43,7 +47,7 @@ class _BreakdownPageState extends State<BreakdownPage> {
   }
 
 
-  Future<List> fetchMachines() async {
+  Future<List> fetchlogs() async {
     final url = Uri.parse(
         "https://machine-maintenance.ddns.net/api/maintenance/breakdown-logs/");
 
@@ -54,58 +58,75 @@ class _BreakdownPageState extends State<BreakdownPage> {
       print(data);
       return data;
     } else {
-      throw  Exception("failed to load machine. Makesure you phone have stable internet connection");
+      throw  Exception("failed to load log. Makesure you phone have stable internet connection");
     }
   }
 
   Future<void> _refreshData() async {
     setState(() {
-      futureMachines = fetchMachines(); // Refresh the data by calling the API again
+      futurelogs = fetchlogs(); // Refresh the data by calling the API again
     });
   }
 
-  Widget funListViewBuilder({required List machines}) {
+  Widget funListViewBuilder({required List logs}) {
     return ListView.builder(
-        itemCount: machines.length,
+        itemCount: logs.length,
         itemBuilder: (context, index) {
-          return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            color: Colors.white,
-            child: SizedBox(
-              height: 70,
-              width: double.infinity,
-              child: Container(
-                margin: EdgeInsets.only(left: 10),
-                alignment: Alignment.center,
-                padding: EdgeInsets.all(5),
-                child: Column(
-                  children: [
-                    Text(
-                      "Id: ${machines[index]['id']}",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
+          return Padding(
+              padding: EdgeInsets.fromLTRB(16, 1, 16, 1),
+              child: SizedBox(
+                  height: 120,
+                  width: double.infinity,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    Text(
-                      "Breakdown Start: ${machines[index]['breakdown_start']}",
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    Text(
-                      "lost time: ${machines[index]['lost_time']}",
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
+                    color: Colors.white,
+                    child:  Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              SizedBox(width: 10),
+                              Container(
+                                alignment: Alignment.center,
+                                height: 80,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                    color: AppColors.disabledMainColor, // White background for the icon
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+                                padding: EdgeInsets.all(7),
+                                child: Text("${logs[index]["id"]}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
+                              ),
+                              SizedBox(width: 8),
+                              Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Problem: ${logs[index]["problem_category"]}", style: AppStyles.textH2),
+                                    Text("${logs[index]["breakdown_start"]}", style: AppStyles.bodyTextBold),
+                                    SizedBox(height: 10),
+                                    Text("Lost Time: ${logs[index]["lost_time"]}", style: AppStyles.textH4),
+                                    Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Text("Line: ${logs[index]["line"]}", style: AppStyles.bodyTextBold),
+                                          SizedBox(width: 20),
+                                          Text("Machine: ${logs[index]["machine"]}", style: AppStyles.bodyTextBold)
+                                        ]
+                                    ),
+                                    // Text("${logs[index]["status"]}")
+
+                                  ])
+                            ]
+                        )
+                        ]
+                    ) ,
+                  )));
         });
   }
 

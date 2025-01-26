@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptech_erp/appResources.dart';
 
 class InventoryPage extends StatelessWidget {
   const InventoryPage({super.key});
@@ -7,8 +8,8 @@ class InventoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text("Inventory"),
+        appBar: customAppBar(
+          title: "Inventory",
           leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -16,7 +17,7 @@ class InventoryPage extends StatelessWidget {
               icon: Icon(Icons.arrow_back)),
         ),
         body: Center(
-          child: ElevatedButton(onPressed: () {}, child: Text("")),
+          child: Text("Inventories page"),
         ),
       ),
     );

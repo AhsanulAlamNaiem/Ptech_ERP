@@ -71,7 +71,7 @@ class _LogInPageState extends State<LogInPage> {
               context: context,
               builder: (context) => AlertDialog(
                     title: Text("Login Successful"),
-                    content: Text("Welcome, ${data["name"]}"),
+                    content: Text("Welcome, ${employeeInfo["name"]}"),
                     actions: [
                       TextButton(
                           onPressed: () {
@@ -139,7 +139,7 @@ class _LogInPageState extends State<LogInPage> {
         body: Padding(
           padding: const EdgeInsets.fromLTRB(16.0,40,16,0),
           child: Column( children: [ Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
 
             children: [
               TextField(
@@ -174,17 +174,17 @@ class _LogInPageState extends State<LogInPage> {
               isLoading
                   ? CircularProgressIndicator()
                   : ElevatedButton(
-                    style: AppStyles.elevatedButtonStyle,
+                    style: AppStyles.elevatedButtonStyleFullWidth,
                       onPressed: () {
                         login();
                       },
-                      child: Text("Login")),
+                      child: Text("Login", style: TextStyle(color: Colors.white),)),
               TextButton(
                   style: ButtonStyle(
                     padding: MaterialStateProperty.all<EdgeInsets>(
                         EdgeInsets.all(0)),
                   ),
-                  onPressed: (){}, child: Text("Forget Password?")),
+                  onPressed: (){}, child: Text("Forget Password?", style: TextStyle(color: Colors.black))),
 
               // ElevatedButton(
               //     style: AppStyles.elevatedButtonStyle,

@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
   final Map user;
   _HomeScreenState(this.user);
   final storage = FlutterSecureStorage();
@@ -44,24 +44,24 @@ class _HomeScreenState extends State<HomeScreen> {
           Btn("Production", ProductionPage()),
           Btn("Maintenance", Maintanance()),
           Btn("Inventory", InventoryPage()),
-          ElevatedButton(
-              onPressed: () async {
-                final securedDesignation = "designation";
-                final desg = await storage.read(key: securedDesignation);
-                if (desg == "Mechanic") {
-                  await storage.write(
-                      key: securedDesignation, value: "Supervisor");
-                } else {
-                  await storage.write(
-                      key: securedDesignation, value: "Mechanic");
-                }
-              },
-              child: Text("change designation"))
+          // ElevatedButton(
+          //     onPressed: () async {
+          //       final securedDesignation = "designation";
+          //       final desg = await storage.read(key: securedDesignation);
+          //       if (desg == "Mechanic") {
+          //         await storage.write(
+          //             key: securedDesignation, value: "Supervisor");
+          //       } else {
+          //         await storage.write(
+          //             key: securedDesignation, value: "Mechanic");
+          //       }
+          //     },
+          //     child: Text("change designation"))
         ]));
     }
 
     final List<Widget> pages = [
-      funcHomeBuilder(),
+      // funcHomeBuilder(),
       funcHomeBuilder(),
       MachineScanner()
     ];
@@ -70,86 +70,102 @@ class _HomeScreenState extends State<HomeScreen> {
         onWillPop: () async {
           final shouldAllowPop = _currentIndex == 1 ? true : false;
           setState(() {
-            _currentIndex = 1;
+            _currentIndex = 0;
           });
           return shouldAllowPop; // Block back navigation
         },
         child: Scaffold(
-          appBar: PreferredSize(
-        preferredSize: Size.fromHeight(150), // Adjust the height as needed
-        child: ClipRRect(
-        borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(15), // Bottom left corner rounded
-        bottomRight: Radius.circular(15), // Bottom right corner rounded
-        ),
-        child: AppBar(
-          backgroundColor: AppColors.mainColor,
-          title: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Image.asset('assets/images/logowhite.png',
-                    width: 60, height: 60,fit: BoxFit.cover),
-                Text("Ptech ERP", style: AppStyles.textOnMainColorheading,)
-              ]
-          ),
-          centerTitle: true,
-        ))),
-          bottomNavigationBar: BottomNavigationBar(
+          appBar: customAppBar(title: "Ptech ERP", action: [
+            IconButton(
+                onPressed: () async {
+            // Handle sign out action
+            await storage.delete(key: securedKey);
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LogInPage()));
+          }, icon: Icon(Icons.logout))]),
+          bottomNavigationBar: ClipRRect(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(0),
+            ),
+            child: BottomNavigationBar(
+            backgroundColor: AppColors.mainColor,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white60,
+            showSelectedLabels: true,
+
+
             currentIndex: _currentIndex,
-            selectedItemColor: Colors.green,
+
             onTap: (index) {
               setState(() {
                 _currentIndex = index;
               });
             },
             items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.dashboard), label: "Dashboard"),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.dashboard), label: "Dashboard"),
               BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
               BottomNavigationBarItem(
                   icon: Icon(Icons.document_scanner), label: "Machine"),
             ],
-          ),
+          )),
           body: pages[_currentIndex],
-          endDrawer: Drawer(
+          drawer: Drawer(
             child: SizedBox(
-                width: 100,
+                width: 80,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    UserAccountsDrawerHeader(
-                      accountName: Text("${user["name"]}"),
-                      accountEmail: Text(
-                          "${user["designation"]} - ${user["department"]}"),
-                      currentAccountPicture: CircleAvatar(
-                        backgroundImage: AssetImage("assets/images/user.png"),
-                      ),
-                      decoration: BoxDecoration(color: Colors.green),
+                    SizedBox(height: 50,),
+                    Container(
+                      color: AppColors.disabledMainColor,
+                      child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(backgroundImage: AssetImage("assets/images/user.png"), radius: 60, backgroundColor: AppColors.accentColor,),
+                        SizedBox(height: 15),
+                        Text("${user["name"]}",style: AppStyles.textH2,),
+                        Text("${user["designation"]}, ${user["department"]}"),
+                        Text("${user["company"]}",style: AppStyles.textH3,),
+                        SizedBox(height: 15),
+                        Divider(
+                          color: AppColors.accentColor,      // Color of the line
+                          thickness: 4.0,          // Thickness of the line
+                          indent: 0.0,            // Start padding
+                          endIndent: 0.0,         // End padding
+                        ),
+                      ]
+                    )),
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                        TextButton(onPressed: (){}, child: Text("Terms & Conditions")),
+                        TextButton(onPressed: (){}, child: Text("Contact Us")),
+                        TextButton(onPressed: (){}, child: Text("Help/FAQs")),
+                        TextButton(onPressed: (){}, child: Text("Subscriptions")),
+                        TextButton(onPressed: (){}, child: Text("Rate Us")),
+                        TextButton(onPressed: (){}, child: Text("Update")),
+                      ]
                     ),
+
                     Spacer(),
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          // Handle sign out action
-                          await storage.delete(key: securedKey);
-                          Navigator.pop(context);
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LogInPage()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                        ),
-                        child: Row(
+                      child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.logout),
-                            SizedBox(width: 8),
-                            Text('Sign Out'),
+                            Image.asset('assets/images/panaceaLogo.png',
+                                width: 60, height: 60,fit: BoxFit.cover),
+                            Text('Ptech ERP - Panacea Private Consultancy', style: AppStyles.bodyTextgray,),
                           ],
                         ),
-                      ),
+                      )
+                      ]
                     ),
                   ],
                 )),
