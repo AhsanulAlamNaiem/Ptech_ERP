@@ -37,8 +37,8 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
 
   Future<String?> getDesignation() async {
     final storage = FlutterSecureStorage();
-    final securedDesignation = "designation";
-    final designation = await storage.read(key: securedDesignation);
+
+    final designation = await storage.read(key: AppSecuredKey.designation);
 
     return designation;
   }
@@ -79,6 +79,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final machine = widget.machineDetails;
+    double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
 
     return FutureBuilder(
       future: getDesignation(),
@@ -89,18 +90,18 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
           final designation = snapshot.data ?? "Unknown";
           final machineStatus = machine['status'];
 
-          if (designation == "Supervisor") {
-            if (machineStatus == 'active') {
+          if (designation == AppDesignations.superVisor) {
+            if (machineStatus == AppMachineStatus.active) {
               status = "Broken";
               questionText =
               'Is the Machine Broken?\nif yes, at first select problem category and then press "Set to $status" Button';
             }
-            else if (machineStatus == 'maintenance') {
+            else if (machineStatus == AppMachineStatus.maintenance) {
               status = "Active";
               questionText =
               'Is the Machine Active now?\nif yes, at first select problem category and then press "Set to $status" Button';
             }
-          } else if (designation == 'Mechanic' && machineStatus == 'broken') {
+          } else if (designation == AppDesignations.mechanic && machineStatus == AppMachineStatus.broken) {
             status = "Repair";
             questionText =
             'The Machine is Broken?\nTo set it in Maintenance stage press "Set to $status" Button';
@@ -113,7 +114,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                    flex: 3,
+                    flex: 5,
                     child: Card(child: Container(
                         width: double.infinity,
                         child: Padding(padding: EdgeInsets.all(10),
@@ -121,28 +122,22 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  Text("Machine ID: ${machine['machine_id']}",
-                                    style: AppStyles.textH2,),
+                                  Text("Machine ID: ${machine['machine_id']}", style: AppStyles.textH2,),
+                                  SizedBox(height: 15),
+                                  Text("Model Number: ${machine['model_number']}", style: AppStyles.textH2),
+                                  Text("Serial No: ${machine['serial_no']}", style: AppStyles.textH2),
+                                  SizedBox(height: 15),
+                                  Text("Line: ${machine['line']}", style: AppStyles.textH2),
+                                  Text("Sequence: ${machine['sequence']}", style: AppStyles.textH2),
                                   SizedBox(height: 10),
-                                  Text(
-                                      "Model Number: ${machine['model_number']}",
-                                      style: AppStyles.textH3),
-                                  Text("Serial No: ${machine['serial_no']}",
-                                      style: AppStyles.textH3),
-                                  SizedBox(height: 10),
-                                  Text("Line: ${machine['line']}",
-                                      style: AppStyles.textH3),
-                                  Text("Sequence: ${machine['sequence']}",
-                                      style: AppStyles.textH3),
-                                  SizedBox(height: 10),
-                                  Text("Status: $machineStatus",
-                                      style: AppStyles.textH3),
+                                  Text("Last Problem: ${machine['last_problem']}", style: AppStyles.textH2),
+                                  Text("Status: $machineStatus", style: AppStyles.textH2),
                                 ]
                             ))))
                 ),
 
                 Expanded(
-                  flex: 3,
+                  flex: 5,
                   child: Card(
 
                     child: Container(
@@ -153,9 +148,17 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                 (status==null)?SizedBox(height: 0,): Text("$questionText!", style: AppStyles.textH3,),
 
                                 Spacer(),
-                                (status==null || designation =='Mechanic' )? const SizedBox(height: 0):  problemCategories.isEmpty
+                                (status==null || designation ==AppDesignations.mechanic )? const SizedBox(height: 0):  problemCategories.isEmpty
                                       ? const CircularProgressIndicator()
-                                      : DropdownButton<String>(
+                                      : Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                                    border: Border.all(color: AppColors.disabledMainColor, width: 1), // Border styling
+                                  ),
+                                  child: DropdownButton<String>(
+                                  style: AppStyles.textH3 ,
                                     value: selectedCategory,
                                     hint: const Text("Select Problem Category"),
                                     isExpanded: true,
@@ -172,12 +175,20 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                       });
                                       onCategoryChange(selectedCategoryIndex);
                                     },
-                                  ),
+                                  )),
 
-                                designation=='Supervisor'? const SizedBox(height: 5.0): const SizedBox(height: 0),
-                                (status==null || designation =='Mechanic' )? const SizedBox(height: 0):                  DropdownButton<String>(
+                                designation==AppDesignations.superVisor? const SizedBox(height: 5.0): const SizedBox(height: 0),
+                                (status==null || designation ==AppDesignations.mechanic )? const SizedBox(height: 0) :Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                                    border: Border.all(color: AppColors.disabledMainColor, width: 1), // Border styling
+                                  ),
+                                  child: DropdownButton<String>(
+                                  style: AppStyles.textH3,
                                   value: selectedSubCategory,
-                                  hint: const Text("Select Subcategory"),
+                                  hint: const Text("Select Problem Subcategory"),
                                   isExpanded: true,
                                   items: subCategories.map((subCategory) {
                                     return DropdownMenuItem<String>(
@@ -193,7 +204,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                       print(strSelectedSubCategory);
                                     });
                                   },
-                                ),
+                                )),
 
 
                                 ],
@@ -206,9 +217,16 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                 Expanded(
                   flex: 1,
                   child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: (status==null) ? MainAxisAlignment.center :  MainAxisAlignment.spaceAround,
                       children: [
-                        isPatching? CircularProgressIndicator(): (status==null)? SizedBox(height: 0): ElevatedButton(
+                        isPatching? CircularProgressIndicator(): (status==null)? SizedBox(height: 0):
+                          SizedBox(
+                            width: halfScreenWidth + halfScreenWidth *0.035, // Set button width to 50% of screen
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.mainColor,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                                ),
                             onPressed: () {
                               print("$machine \n${status}\n$strSelectedSubCategory\nwillupdatebreakdown: ${designation=='Supervisor' && status =='Active'}");
                               updateMachineStatus(
@@ -216,13 +234,14 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                 status: status=='Repair'?"maintenance":status!.toLowerCase(),
                                 lastProblem: strSelectedSubCategory??"Null",
                                 problemIndex: selectedSubCategoryIndex,
-                                willUpdateBreakdown: designation=='Supervisor' && status=='Active',
+                                willUpdateBreakdown: designation==AppDesignations.superVisor && status=='Active',
 
                                 patchRequestStateUpdater: ({required bool patchingState, String? message=null}){
                                   setState(() {
                                     isPatching = patchingState;
                                   });
-                                  patchingState? widget.refreashData(): print("will update state");
+                                  print("Patching state: $patchingState");
+                                  // patchingState? widget.refreashData(): print("will update state");
 
                                   !(message==null)? ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -233,14 +252,21 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
                                   ):print("No message");
                                 }
                               );
-                            }, child: Text("Set to ${status}"),
-                        ),
+                            }, child: Text("Set to ${status}", style: AppStyles.buttonText),
+                        )),
 
 
-                        ElevatedButton(onPressed: () {
+                      SizedBox(
+                        width: halfScreenWidth-halfScreenWidth*0.05, // Set button width to 50% of screen
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.mainColor,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                          ),
+                          onPressed: () {
                           widget.pressedScanAgain();
-                        }, child: Text("Scan Again"),
-                        ),
+                        }, child: Text("Scan Again",  style: AppStyles.buttonText,),
+                        )),
                       ]
                   ),
                 )

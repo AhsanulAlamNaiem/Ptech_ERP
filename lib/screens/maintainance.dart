@@ -26,8 +26,8 @@ class Maintanance extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
           child: Column(
             children: [
-              Btn("All Machines", AllMaintainances()),
-              Btn("BreakdownLogs", BreakdownPage()),
+              Btn("All Machines", AllMaintainances(), Icons.precision_manufacturing),
+              Btn("BreakdownLogs", BreakdownPage(), Icons.error_outline),
             ],
           ),
         ),

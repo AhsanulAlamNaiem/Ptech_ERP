@@ -18,9 +18,9 @@ Future<void> updateMachineStatus({
 
       Map body = {
         "status": status,
-        "last_repairing_start": (status=='maintenance')? currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z": "${machine["last_repairing_start"]}",
-        "last_breakdown_start": (status=='broken')?  currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z" :"${machine["last_breakdown_start"]}",
-        "last_problem": (status=='active')?"$lastProblem":"$lastProblem"
+        "last_repairing_start": (status==AppMachineStatus.maintenance)? currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z": "${machine["last_repairing_start"]}",
+        "last_breakdown_start": (status==AppMachineStatus.broken)?  currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z" :"${machine["last_breakdown_start"]}",
+        "last_problem": "$lastProblem"
       };
 
       DateTime startTime = DateTime.parse("${machine['last_breakdown_start']}");
@@ -64,7 +64,7 @@ Future<void> updateMachineStatus({
         } else {
           print("will not Update breaddwonLodg");
         }
-    patchRequestStateUpdater(patchingState:false, message:successMessage);
+      patchRequestStateUpdater(patchingState:false, message:successMessage);
 
 
 
@@ -72,11 +72,7 @@ Future<void> updateMachineStatus({
 
       } catch (e) {
         print("Error: $e");
-
           final successMessage = "An error occurred while updating status.";
-          patchRequestStateUpdater(false, successMessage);
-
-      } finally {
-        patchRequestStateUpdater(false, "Something went Wrong!");
+          patchRequestStateUpdater(patchingState: false, message:successMessage);
       }
     }

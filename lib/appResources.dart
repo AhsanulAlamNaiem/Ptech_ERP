@@ -109,7 +109,7 @@ class AppStyles {
 
 }
 
-class securedKey {
+class AppSecuredKey {
   static const String token = 'b42b985d53c4';
   static const String name = '49431de06547';
 
@@ -120,6 +120,16 @@ class securedKey {
   static const String userInfoObject = '940867e93788';
 }
 
+class AppDesignations{
+  static const String mechanic = "Mechanic";
+  static const String superVisor = "Supervisor";
+}
+
+class AppMachineStatus{
+  static const String active = "active";
+  static const String broken = "broken";
+  static const String maintenance = "maintenance";
+}
 
 class AppApis{
   static const String login = 'https://machine-maintenance.ddns.net/api/user_management/login/';

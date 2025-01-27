@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final Map user;
   _HomeScreenState(this.user);
   final storage = FlutterSecureStorage();
-  final securedKey = "Token";
+
 
   Future<Map> falsefetchUser() async {
     return Future.delayed(Duration(seconds: 5), () {
@@ -41,9 +41,9 @@ class _HomeScreenState extends State<HomeScreen> {
       return Padding(
           padding: EdgeInsets.fromLTRB(16, 30, 16, 3),
         child:  Column(children: [
-          Btn("Production", ProductionPage()),
-          Btn("Maintenance", Maintanance()),
-          Btn("Inventory", InventoryPage()),
+          Btn("Production", ProductionPage(), Icons.factory),
+          Btn("Maintenance", Maintanance(), Icons.handyman),
+          Btn("Inventory", InventoryPage(),Icons.assignment),
           // ElevatedButton(
           //     onPressed: () async {
           //       final securedDesignation = "designation";
@@ -75,16 +75,16 @@ class _HomeScreenState extends State<HomeScreen> {
           return shouldAllowPop; // Block back navigation
         },
         child: Scaffold(
-          appBar: customAppBar(title: "Ptech ERP", action: [
-            IconButton(
+          appBar: customAppBar(title: "Ptech ERP", action: [ (_currentIndex==0)?
+          IconButton(
                 onPressed: () async {
             // Handle sign out action
-            await storage.delete(key: securedKey);
+            await storage.delete(key: AppSecuredKey.token);
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                     builder: (context) => LogInPage()));
-          }, icon: Icon(Icons.logout))]),
+          }, icon: Icon(Icons.logout)):Text("")]),
           bottomNavigationBar: ClipRRect(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(0),
@@ -112,19 +112,29 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           )),
           body: pages[_currentIndex],
-          drawer: Drawer(
-            child: SizedBox(
-                width: 80,
+          drawer: Container(
+          width: MediaQuery.of(context).size.width * 0.85,
+           child: Drawer(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 50,),
                     Container(
                       color: AppColors.disabledMainColor,
                       child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        CircleAvatar(backgroundImage: AssetImage("assets/images/user.png"), radius: 60, backgroundColor: AppColors.accentColor,),
+                        SizedBox(height: 50,),
+                        Container(
+                          width: 80, // Diameter = 2 * radius
+                          height: 80,
+                          decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.mainColor,
+                        image: DecorationImage(
+                          image: AssetImage("assets/images/user.png"),
+                          fit: BoxFit.fitHeight, // Ensures the image fits properly
+                          ),
+                        )),
                         SizedBox(height: 15),
                         Text("${user["name"]}",style: AppStyles.textH2,),
                         Text("${user["designation"]}, ${user["department"]}"),
@@ -138,34 +148,39 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ]
                     )),
-                    Column(
+                    Container( child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                        TextButton(onPressed: (){}, child: Text("Terms & Conditions")),
-                        TextButton(onPressed: (){}, child: Text("Contact Us")),
-                        TextButton(onPressed: (){}, child: Text("Help/FAQs")),
-                        TextButton(onPressed: (){}, child: Text("Subscriptions")),
-                        TextButton(onPressed: (){}, child: Text("Rate Us")),
-                        TextButton(onPressed: (){}, child: Text("Update")),
+                        TextButton(onPressed: (){}, child: Text("Terms & Conditions", style: AppStyles.textH3,)),
+                        TextButton(onPressed: (){}, child: Text("Contact Us",  style: AppStyles.textH3)),
+                        TextButton(onPressed: (){}, child: Text("Help/FAQs",  style: AppStyles.textH3)),
+                        TextButton(onPressed: (){}, child: Text("Subscriptions",  style: AppStyles.textH3)),
+                        TextButton(onPressed: (){}, child: Text("Rate Us",  style: AppStyles.textH3)),
+                        TextButton(onPressed: (){}, child: Text("Update",  style: AppStyles.textH3)),
                       ]
-                    ),
+                    )),
 
                     Spacer(),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
+
+
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      child: Container( child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Image.asset('assets/images/panaceaLogo.png',
-                                width: 60, height: 60,fit: BoxFit.cover),
+                            Image.asset('assets/images/ppclogotransparent.png',
+                                width: 50, height: 50,fit: BoxFit.cover),
                             Text('Ptech ERP - Panacea Private Consultancy', style: AppStyles.bodyTextgray,),
+                            Text('Version 1.2.0', style: AppStyles.bodyTextgray,),
+                            Divider(
+                              color: Colors.transparent,      // Color of the line
+                              thickness: 0.0,          // Thickness of the line
+                              indent: 0.0,            // Start padding
+                              endIndent: 0.0,         // End padding
+                            )
                           ],
                         ),
                       )
-                      ]
                     ),
                   ],
                 )),
@@ -176,8 +191,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class Btn extends StatelessWidget {
   final String title;
+  final IconData icon;
   final Widget screen;
-  const Btn(this.title, this.screen, {super.key});
+  const Btn(this.title, this.screen, this.icon, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +218,7 @@ class Btn extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10)
                 ),
                 padding: EdgeInsets.all(7),
-                child: Icon(Icons.stacked_bar_chart_outlined,
+                child: Icon(icon,
                     color: Colors.white,
                 size:40),
               ),

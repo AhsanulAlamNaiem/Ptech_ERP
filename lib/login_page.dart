@@ -18,12 +18,6 @@ class _LogInPageState extends State<LogInPage> {
   String password = "";
   bool isLoading = false;
   final storage = FlutterSecureStorage();
-  final securedKey = "Token";
-  final securedUserInfo = "UserInfo";
-  final securedName = "name";
-  final securedDesignation = "designation";
-  final securedDepartment = "dept";
-  final securedCompany = 'company';
 
   final TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true; // This controls password visibility
@@ -56,16 +50,16 @@ class _LogInPageState extends State<LogInPage> {
           Map employeeInfo = jsonDecode(response.body);
 
           await storage.write(
-              key: securedUserInfo, value: jsonEncode(employeeInfo));
+              key: AppSecuredKey.userInfoObject, value: jsonEncode(employeeInfo));
 
-          await storage.write(key: securedKey, value: token);
-          await storage.write(key: securedName, value: employeeInfo["name"]);
+          await storage.write(key: AppSecuredKey.token, value: token);
+          await storage.write(key: AppSecuredKey.name, value: employeeInfo["name"]);
           await storage.write(
-              key: securedDesignation, value: employeeInfo["designation"]);
+              key: AppSecuredKey.designation, value: employeeInfo["designation"]);
           await storage.write(
-              key: securedDepartment, value: employeeInfo["department"]);
+              key: AppSecuredKey.department, value: employeeInfo["department"]);
           await storage.write(
-              key: securedCompany, value: employeeInfo["company"]);
+              key: AppSecuredKey.company, value: employeeInfo["company"]);
 
           showDialog(
               context: context,
@@ -126,6 +120,7 @@ class _LogInPageState extends State<LogInPage> {
     bottomRight: Radius.circular(15), // Bottom right corner rounded
     ),
     child: AppBar(
+
           backgroundColor: AppColors.mainColor,
           title: Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -142,30 +137,34 @@ class _LogInPageState extends State<LogInPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
 
             children: [
-              TextField(
+              TextFormField(
+                // validator: (val)=> val!.isEmpty || !val.contains("@")?"enter a valid email":null,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
-                    hintText: 'Enter your Email',
+                    hintText: 'Email',
                     border: OutlineInputBorder(),
-                    labelText: "Email"),
+                    labelText: "Email",
+                ),
                 onChanged: (value) {
                   email = value;
                 },
               ),
               SizedBox(height: 20),
               TextField(
+
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock),
+                      prefixIcon: Icon(Icons.lock),
                     suffixIcon: IconButton(onPressed: (){
                       setState(() {
                         _obscurePassword = !_obscurePassword;
                       });
 
                     }, icon: Icon(_obscurePassword? Icons.visibility:Icons.visibility_off)),
-                    hintText: 'Enter Password',
+                    hintText: 'Password',
                     border: OutlineInputBorder(),
-                    labelText: "Password"),
+                    labelText: "Password",
+                ),
                 onChanged: (value) {
                   password = value;
                 },
@@ -198,8 +197,9 @@ class _LogInPageState extends State<LogInPage> {
           ),
             Spacer(),
             Image.asset('assets/images/panaceaLogo.png',
-                width: 60, height: 60,fit: BoxFit.cover),
-            Text("Ptech ERP - Panacea Private Consulting")])
+                width: 50, height: 50,fit: BoxFit.cover),
+            Text("Ptech ERP - Panacea Private Consulting", style: TextStyle(color: AppColors.fontColorGray)),
+            SizedBox(height: 10)])
         ));
   }
 }
