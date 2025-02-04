@@ -55,7 +55,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
           final notification = notifications[index];
           return Card(
             child: ListTile(
-              title: Text(notification['title']),
+              title: Row(
+                  children: [
+                    Expanded(
+                      flex: 8,
+                      child: Text(notification['title'])),
+                    Expanded(
+                        flex: 1,
+                        child: IconButton(onPressed: () async{
+                          await DatabaseHelper().deleteNotification(notification['id']);
+                          _loadNotifications();
+                        }, icon: Icon(Icons.delete)),
+                  )]),
               onTap: () => _showNotificationPopup(context, notification),
             ),
           );
