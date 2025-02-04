@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ptech_erp/appResources.dart';
+import 'package:ptech_erp/services/app_provider.dart';
 import 'database_helper.dart';
 
 class FirebaseApi {
@@ -39,6 +40,7 @@ class FirebaseApi {
       print('Message received in foreground: ${message.notification?.title}');
       if(designation == "Mechanic"  || designation == "Admin Officer") {
         await _storeNotification(message);
+        AppProvider().loadNotification();
         _showNotification(
           message.notification?.title,
           message.notification?.body,

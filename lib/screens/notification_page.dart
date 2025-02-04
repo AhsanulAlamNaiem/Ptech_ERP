@@ -9,20 +9,14 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  List<Map<String, dynamic>> notifications = [];
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    _loadNotifications();
+    context.read<AppProvider>().loadNotification();
   }
 
-  Future<void> _loadNotifications() async {
-    notifications = await DatabaseHelper().getNotifications();
-    setState(() {
-
-    });
-  }
 
   void _showNotificationPopup(BuildContext context, Map<String, dynamic> notification) {
     showDialog(
@@ -35,7 +29,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             onPressed: () async {
               Navigator.pop(context);
               await DatabaseHelper().deleteNotification(notification['id']);
-              _loadNotifications(); // Refresh UI
+              context.read<AppProvider>().loadNotification(); // Refresh UI
             },
             child: Text('OK'),
           ),
@@ -46,7 +40,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-
+    final notifications = context.watch<AppProvider>().notifications;
     return notifications.isEmpty
           ? Center(child: Text('No notifications'))
           : ListView.builder(
@@ -64,7 +58,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         flex: 1,
                         child: IconButton(onPressed: () async{
                           await DatabaseHelper().deleteNotification(notification['id']);
-                          _loadNotifications();
+                          context.read<AppProvider>().loadNotification();
                         }, icon: Icon(Icons.delete)),
                   )]),
               onTap: () => _showNotificationPopup(context, notification),
