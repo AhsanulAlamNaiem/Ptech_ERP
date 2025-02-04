@@ -1,11 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:ptech_erp/services/app_provider.dart';
 import 'package:ptech_erp/services/firebase_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:ptech_erp/login_page.dart';
-
 import 'appResources.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,10 +20,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+              create: (context)=>AppProvider()
+          )
+      ],
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
-    );
+    ));
+
   }
 }
 

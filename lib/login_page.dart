@@ -3,7 +3,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'appResources.dart';
 
 class LogInPage extends StatefulWidget {
@@ -60,6 +59,9 @@ class _LogInPageState extends State<LogInPage> {
               key: AppSecuredKey.department, value: employeeInfo["department"]);
           await storage.write(
               key: AppSecuredKey.company, value: employeeInfo["company"]);
+          await storage.write(
+              key: AppSecuredKey.id, value: data['user_id'].toString());
+
 
           showDialog(
               context: context,

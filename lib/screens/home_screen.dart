@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
 import 'package:ptech_erp/appResources.dart';
 import 'package:ptech_erp/login_page.dart';
 import 'package:ptech_erp/screens/inventory.dart';
 import 'package:ptech_erp/screens/production.dart';
+import 'package:ptech_erp/services/app_provider.dart';
+import 'package:ptech_erp/services/database_helper.dart';
 import 'machine_scanner.dart';
-import 'maintainance.dart';
+import 'maintainance/maintainance.dart';
+import 'notification_page.dart';
 
 class HomeScreen extends StatefulWidget {
   Map user;
@@ -32,11 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // return Text("$user");
-    return homeScreenBuilder(user);
-  }
 
-  Widget homeScreenBuilder(Map user) {
     Widget funcHomeBuilder() {
       return Padding(
           padding: EdgeInsets.fromLTRB(16, 30, 16, 3),
@@ -44,26 +44,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Btn("Production", ProductionPage(), Icons.factory),
           Btn("Maintenance", Maintanance(), Icons.handyman),
           Btn("Inventory", InventoryPage(),Icons.assignment),
-          // ElevatedButton(
-          //     onPressed: () async {
-          //       final securedDesignation = "designation";
-          //       final desg = await storage.read(key: securedDesignation);
-          //       if (desg == "Mechanic") {
-          //         await storage.write(
-          //             key: securedDesignation, value: "Supervisor");
-          //       } else {
-          //         await storage.write(
-          //             key: securedDesignation, value: "Mechanic");
-          //       }
-          //     },
-          //     child: Text("change designation"))
         ]));
     }
 
     final List<Widget> pages = [
-      // funcHomeBuilder(),
       funcHomeBuilder(),
-      MachineScanner()
+      MachineScanner(),
+      NotificationsPage()
     ];
 
     return WillPopScope(
@@ -75,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return shouldAllowPop; // Block back navigation
         },
         child: Scaffold(
-          appBar: customAppBar(title: "Ptech ERP", action: [ (_currentIndex==0)?
+          appBar: customAppBar(title:  (_currentIndex==2)?"Notifications":"Ptech ERP", action: [ (_currentIndex==0)?
           IconButton(
                 onPressed: () async {
             // Handle sign out action
@@ -84,7 +71,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => LogInPage()));
-          }, icon: Icon(Icons.logout)):Text("")]),
+          }, icon: Icon(Icons.logout)): (_currentIndex==2)?
+              IconButton(onPressed: () async{
+                DatabaseHelper().deleteAllNotifications();
+                final localNotifications = await DatabaseHelper().getNotifications();
+                context.read()<AppProvider>().updateNotification(localNotifications);
+              }, icon: Icon(Icons.delete_sweep)):Text("")]),
           bottomNavigationBar: ClipRRect(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(0),
@@ -99,16 +91,19 @@ class _HomeScreenState extends State<HomeScreen> {
             currentIndex: _currentIndex,
 
             onTap: (index) {
+              context.read<AppProvider>().updateScannerState(scanningState: true);
               setState(() {
                 _currentIndex = index;
               });
+
             },
+
             items: const [
               // BottomNavigationBarItem(
               //     icon: Icon(Icons.dashboard), label: "Dashboard"),
               BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.document_scanner), label: "Machine"),
+              BottomNavigationBarItem(icon: Icon(Icons.document_scanner), label: "Machine"),
+              BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notifications")
             ],
           )),
           body: pages[_currentIndex],

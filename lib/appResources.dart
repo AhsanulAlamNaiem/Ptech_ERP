@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AppColors {
   static const Color mainColor = Color(0xFFEE1B22);
@@ -110,10 +111,12 @@ class AppStyles {
 }
 
 class AppSecuredKey {
+  static const Object storage = FlutterSecureStorage();
   static const String token = 'b42b985d53c4';
   static const String name = '49431de06547';
+  static const String id = '4943135dte54t';
 
-  static const String designation = '49431de06547';
+  static const String designation = '4943143t40653x';
   static const String department = '5b6953794963';
   static const String company = '8ca7cec8fa1e';
 
