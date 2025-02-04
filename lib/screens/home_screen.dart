@@ -78,9 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
               IconButton(onPressed: () async{
                 context.read<AppProvider>().deleteAllNotifications();
-
                 final localNotifications = await DatabaseHelper().getNotifications();
-                context.read()<AppProvider>().updateNotification(localNotifications);
+                context.read<AppProvider>().loadNotification();
+
               }, icon: Icon(Icons.delete_sweep)):Text("")]),
 
 
