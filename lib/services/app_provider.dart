@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'database_helper.dart';
+
 class AppProvider extends ChangeNotifier{
   String? qrCode;
   bool isScanning = true;
@@ -29,8 +31,15 @@ class AppProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  updateNotification(newNotifications){
-    notifications = newNotifications;
+  loadNotification() async{
+    notifications = await DatabaseHelper().getNotifications();
     notifyListeners();
   }
+
+  Future<void> deleteAllNotifications() async {
+    await DatabaseHelper().deleteAllNotifications();
+    notifications.clear();
+    notifyListeners();
+  }
+
 }

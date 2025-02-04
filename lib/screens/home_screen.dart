@@ -62,7 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
           return shouldAllowPop; // Block back navigation
         },
         child: Scaffold(
-          appBar: customAppBar(title:  (_currentIndex==2)?"Notifications":"Ptech ERP", action: [ (_currentIndex==0)?
+          appBar: customAppBar(
+              title:  (_currentIndex==2)?"Notifications":"Ptech ERP",
+              action: [ (_currentIndex==0)?
           IconButton(
                 onPressed: () async {
             // Handle sign out action
@@ -71,12 +73,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => LogInPage()));
-          }, icon: Icon(Icons.logout)): (_currentIndex==2)?
+          }, icon: Icon(Icons.logout)):
+              (_currentIndex==2)?
+
               IconButton(onPressed: () async{
-                DatabaseHelper().deleteAllNotifications();
+                context.read<AppProvider>().deleteAllNotifications();
+
                 final localNotifications = await DatabaseHelper().getNotifications();
                 context.read()<AppProvider>().updateNotification(localNotifications);
               }, icon: Icon(Icons.delete_sweep)):Text("")]),
+
+
           bottomNavigationBar: ClipRRect(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(0),
