@@ -166,3 +166,7 @@ PreferredSize customAppBar({required String title, List<Widget>? action = null ,
             actions: action,
           )));
 }
+
+class AppNavigator {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+}

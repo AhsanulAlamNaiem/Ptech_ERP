@@ -1,12 +1,14 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:ptech_erp/appResources.dart';
+import 'package:ptech_erp/services/appResources.dart';
 import 'package:ptech_erp/login_page.dart';
 import 'package:ptech_erp/screens/inventory.dart';
 import 'package:ptech_erp/screens/production.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 import 'package:ptech_erp/services/database_helper.dart';
+import '../services/firebase_api.dart';
 import 'machine_scanner.dart';
 import 'maintainance/maintainance.dart';
 import 'notification_page.dart';
@@ -22,13 +24,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
   final Map user;
   _HomeScreenState(this.user);
   final storage = FlutterSecureStorage();
 
-
-  Future<Map> falsefetchUser() async {
+    Future<Map> falsefetchUser() async {
     return Future.delayed(Duration(seconds: 5), () {
       return {"user": "falseUser"};
     });
@@ -36,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    int _currentIndex = context.watch<AppProvider>().index;
 
     Widget funcHomeBuilder() {
       return Padding(
@@ -100,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: (index) {
               context.read<AppProvider>().updateScannerState(scanningState: true);
               setState(() {
-                _currentIndex = index;
+                context.read<AppProvider>().setIndex(index);
               });
 
             },

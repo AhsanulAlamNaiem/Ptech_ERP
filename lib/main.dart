@@ -5,7 +5,7 @@ import 'package:ptech_erp/services/firebase_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:ptech_erp/login_page.dart';
-import 'appResources.dart';
+import 'services/appResources.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
           )
       ],
     child: MaterialApp(
+      navigatorKey: AppNavigator.navigatorKey,
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
     ));

@@ -9,6 +9,7 @@ class AppProvider extends ChangeNotifier{
   Map? machine;
   String? model;
   List<Map<String, dynamic>> notifications = [];
+  int index = 0;
 
   updateQrCodeValue({ required String qrCodeValue}) async{
     qrCode = qrCodeValue;
@@ -39,6 +40,11 @@ class AppProvider extends ChangeNotifier{
   Future<void> deleteAllNotifications() async {
     await DatabaseHelper().deleteAllNotifications();
     notifications.clear();
+    notifyListeners();
+  }
+
+  setIndex(int newIndex){
+    index = newIndex;
     notifyListeners();
   }
 

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 
-import '../../appResources.dart';
+import '../../services/appResources.dart';
 import 'after_scan_interactions.dart';
 import 'machine_details.dart';
 

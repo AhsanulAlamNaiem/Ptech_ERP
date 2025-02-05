@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ptech_erp/appResources.dart';
+import 'package:ptech_erp/services/appResources.dart';
 
 class InventoryPage extends StatelessWidget {
   const InventoryPage({super.key});

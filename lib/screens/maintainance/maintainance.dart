@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 
-import '../../appResources.dart';
+import '../../services/appResources.dart';
 import 'breakdown.dart';
 
 class Maintanance extends StatelessWidget {

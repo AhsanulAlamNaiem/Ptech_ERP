@@ -28,7 +28,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              await DatabaseHelper().deleteNotification(notification['id']);
+              // await DatabaseHelper().deleteNotification(notification['id']);
               context.read<AppProvider>().loadNotification(); // Refresh UI
             },
             child: Text('OK'),

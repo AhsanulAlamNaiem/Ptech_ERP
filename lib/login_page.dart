@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'appResources.dart';
+import 'services/appResources.dart';
 
 class LogInPage extends StatefulWidget {
   const LogInPage({super.key});

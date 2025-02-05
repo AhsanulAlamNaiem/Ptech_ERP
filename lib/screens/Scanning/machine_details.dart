@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 
-import '../../appResources.dart';
+import '../../services/appResources.dart';
 
 class MachineDetailsPage extends StatefulWidget {
   @override
