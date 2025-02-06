@@ -24,7 +24,7 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final machine = context
-        .read<AppProvider>()
+        .watch<AppProvider>()
         .machine!;
     final machineStatus = machine['status'];
 

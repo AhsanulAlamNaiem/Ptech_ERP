@@ -46,7 +46,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SPlashScreenState extends State<SplashScreen> {
   final storage = FlutterSecureStorage();
-
+  String? designatione;
   Future<Map?> loginControl() async {
     // final name =  "John Doe";
     // final designation = "admin";
@@ -61,9 +61,10 @@ class _SPlashScreenState extends State<SplashScreen> {
 
     final token = await storage.read(key: AppSecuredKey.token);
     final namee = await storage.read(key: AppSecuredKey.name) ?? "null";
-    final designatione = await storage.read(key: AppSecuredKey.designation) ?? "null";
+    designatione = await storage.read(key: AppSecuredKey.designation) ?? "null";
     final departmente = await storage.read(key: AppSecuredKey.department) ?? "null";
     final companye = await storage.read(key: AppSecuredKey.company) ?? "null";
+
 
     final userInfo = {
       "name": namee,

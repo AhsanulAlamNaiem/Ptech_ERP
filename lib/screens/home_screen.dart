@@ -28,15 +28,11 @@ class _HomeScreenState extends State<HomeScreen> {
   _HomeScreenState(this.user);
   final storage = FlutterSecureStorage();
 
-    Future<Map> falsefetchUser() async {
-    return Future.delayed(Duration(seconds: 5), () {
-      return {"user": "falseUser"};
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     int _currentIndex = context.watch<AppProvider>().index;
+    final designation = user["designation"];
 
     Widget funcHomeBuilder() {
       return Padding(
@@ -54,6 +50,15 @@ class _HomeScreenState extends State<HomeScreen> {
       NotificationsPage()
     ];
 
+    List<BottomNavigationBarItem> _navigationItems =  [
+      BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+      BottomNavigationBarItem(icon: Icon(Icons.document_scanner), label: "Machine"),
+
+    ];
+    print(designation);
+    if(designation==AppDesignations.mechanic){
+      _navigationItems.add(BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notifications"));
+    }
     return WillPopScope(
         onWillPop: () async {
           final shouldAllowPop = _currentIndex == 1 ? true : false;
@@ -106,13 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             },
 
-            items: const [
-              // BottomNavigationBarItem(
-              //     icon: Icon(Icons.dashboard), label: "Dashboard"),
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-              BottomNavigationBarItem(icon: Icon(Icons.document_scanner), label: "Machine"),
-              BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notifications")
-            ],
+            items: _navigationItems,
           )),
           body: pages[_currentIndex],
           drawer: Container(

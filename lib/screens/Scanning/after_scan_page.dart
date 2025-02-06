@@ -48,65 +48,22 @@ class _AfterScanPageState extends State<AfterScanPage> {
   @override
   void initState() {
     super.initState();
-    print("initiated");
-    fetchProblemCategories();
-    print("fetched");
+    Provider.of<AppProvider>(context, listen: false).loadMachineData();
     isFetchingProblemCategory = false;
   }
-
-  Future<void> fetchProblemCategories() async {
-    try {
-      final response = await http.get(Uri.parse(AppApis.getProblemCategory));
-      if (response.statusCode == 200) {
-        setState(() {
-          problemCategories = json.decode(response.body);
-        });
-      } else {
-        throw Exception('Failed to load data');
-      }
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
-  Future<Map?> funcFetchMachineDetails(String model) async {
-    final queryParams = {
-      'machine_id': '$model'
-    };
-    final url = Uri.parse(AppApis.Machines).replace(queryParameters: queryParams);
-    print(url);
-
-    final headers = {'Content-Type': 'application/json'};
-    final response = await http.get(url);
-
-    print(response.statusCode);
-
-    if (response.statusCode == 200) {
-      List<dynamic> jsonDecodedData = jsonDecode(response.body);
-      print("Json data: $jsonDecodedData");
-      Map machineObject = jsonDecodedData[0];
-      print("machine Object: $machineObject");
-      return machineObject;
-    }
-  }
-
 
 
   @override
   Widget build(BuildContext context) {
-    final machine = context.read<AppProvider>().machine??{};
-    final model = context.read<AppProvider>().model;
     double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
-
-    return FutureBuilder(
-      future: funcFetchMachineDetails(model!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return Consumer<AppProvider>(
+      builder: (context, appProvider, child) {
+        if (appProvider.isPatching) {
+          print("patching now");
           return Center(child: CircularProgressIndicator());
         } else {
-          if(snapshot.hasData){
-            context.read<AppProvider>().updateMachineData(snapshot.data!);
-            return Padding(
+          if(appProvider.machine!=null){
+              return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,4 +105,24 @@ class _AfterScanPageState extends State<AfterScanPage> {
     );
   }
 }
-// Function to update the machine status
+
+Future<Map?> funcFetchMachineDetails(String model) async {
+  final queryParams = {
+    'machine_id': '$model'
+  };
+  final url = Uri.parse(AppApis.Machines).replace(queryParameters: queryParams);
+  print(url);
+
+  final headers = {'Content-Type': 'application/json'};
+  final response = await http.get(url);
+
+  print(response.statusCode);
+
+  if (response.statusCode == 200) {
+    List<dynamic> jsonDecodedData = jsonDecode(response.body);
+    print("Json data: $jsonDecodedData");
+    Map machineObject = jsonDecodedData[0];
+    print("machine Object: $machineObject");
+    return machineObject;
+  }
+}

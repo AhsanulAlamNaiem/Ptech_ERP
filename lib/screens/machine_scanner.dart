@@ -24,7 +24,7 @@ class _MachineScannerPageState extends State<MachineScanner> {
     return Scaffold(
       body: context.watch<AppProvider>().isScanning
           ? QrScanner()
-          : context.watch<AppProvider>().isPatching? CircularProgressIndicator():  AfterScanPage()
+          :  AfterScanPage()
     );
   }
 }

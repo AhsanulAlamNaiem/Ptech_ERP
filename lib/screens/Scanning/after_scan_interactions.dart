@@ -268,10 +268,10 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                   problemIndex: selectedSubCategoryIndex,
                                   willUpdateBreakdown: designation==AppDesignations.superVisor && status=='Active',
                               );
-                              context.read<AppProvider>().updatePatchingState(false);
+                              Provider.of<AppProvider>(context, listen: true).loadMachineData();
+                              context.watch()<AppProvider>().updatePatchingState(false);
                             }, child: Text("Set to ${status}", style: AppStyles.buttonText),
                           )),
-
 
                       SizedBox(
                           width: halfScreenWidth-halfScreenWidth*0.05, // Set button width to 50% of screen
@@ -308,8 +308,6 @@ Future<void> updateMachineStatus({
   Map breakdownBody = const {},
   bool willUpdateBreakdown = false,
   required Function patchRequestStateUpdater}) async {
-
-  patchRequestStateUpdater(patchingState:true);
 
   final currentTIme = DateTime.now().toUtc().toString().split('.').first;
   final storage = FlutterSecureStorage();
@@ -366,11 +364,10 @@ Future<void> updateMachineStatus({
     } else {
       print("will not Update breaddwonLodg");
     }
-    patchRequestStateUpdater(patchingState:false, message:successMessage);
+
 
   } catch (e) {
     print("Error: $e");
     final successMessage = "An error occurred while updating status.";
-    patchRequestStateUpdater(patchingState: false, message:successMessage);
   }
 }

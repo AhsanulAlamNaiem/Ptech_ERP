@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:ptech_erp/services/app_provider.dart';
 import 'dart:convert';
 import 'services/appResources.dart';
 
@@ -55,6 +57,7 @@ class _LogInPageState extends State<LogInPage> {
           await storage.write(key: AppSecuredKey.name, value: employeeInfo["name"]);
           await storage.write(
               key: AppSecuredKey.designation, value: employeeInfo["designation"]);
+
           await storage.write(
               key: AppSecuredKey.department, value: employeeInfo["department"]);
           await storage.write(
