@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -6,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 import '../../services/appResources.dart';
+import 'interaction_widgets.dart';
 
 class AfterScanInteractionsPage extends StatefulWidget {
   @override
@@ -17,6 +19,9 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
   int selectedCategoryIndex = -1;
   String? selectedCategory;
   List<dynamic> problemCategories = [];
+
+  List<MachinePart> parts = [];
+  List<MachinePart> selectedParts = [];
 
   int selectedSubCategoryIndex = -1;
   dynamic selectedSubCategory;
@@ -117,15 +122,22 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     print("initiated");
     fetchProblemCategories();
     print("fetched");
-    isFetchingProblemCategory = false;
   }
 
   Future<void> fetchProblemCategories() async {
     try {
       final response = await http.get(Uri.parse(AppApis.getProblemCategory));
-      if (response.statusCode == 200) {
+      final partsResponse = await http.get(Uri.parse(AppApis.getMachineParts));
+
+      if (response.statusCode == 200 && partsResponse.statusCode ==200) {
         setState(() {
+          print("parts:${partsResponse.body}");
+          parts = (jsonDecode(partsResponse.body) as List)
+              .map((data) => MachinePart.fromJson(data))
+              .toList();
+
           problemCategories = json.decode(response.body);
+          isFetchingProblemCategory = false;
         });
       } else {
         throw Exception('Failed to load data');
@@ -167,13 +179,13 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
           }
 
 
-          return Column(
+          return SingleChildScrollView(
+            child:  Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 5,
+              Container(
+                height: 400,
                 child: Card(
-
                   child: Container(
                       width: double.infinity,
                       child: Padding(padding: EdgeInsets.all(10),
@@ -181,8 +193,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                             children: [
                               (status==null)?SizedBox(height: 0,): Text("$questionText!", style: AppStyles.textH3,),
 
-                              Spacer(),
-                              (status==null || designation ==AppDesignations.mechanic )? const SizedBox(height: 0):  problemCategories.isEmpty
+                              SizedBox(height: 4),
+                              (status==null || designation == AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance )? const SizedBox(height: 0):  problemCategories.isEmpty
                                   ? const CircularProgressIndicator()
                                   : Container(
                                   padding: EdgeInsets.symmetric(horizontal: 5),
@@ -212,7 +224,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                   )),
 
                               designation==AppDesignations.superVisor? const SizedBox(height: 5.0): const SizedBox(height: 0),
-                              (status==null || designation ==AppDesignations.mechanic )? const SizedBox(height: 0) :Container(
+                              (status==null || designation ==AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance )? const SizedBox(height: 0) :Container(
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -239,6 +251,22 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                       });
                                     },
                                   )),
+                              (status==null || designation == AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance )?
+                              isFetchingProblemCategory?
+                              Center(child: CircularProgressIndicator()):
+                              SingleChildScrollView( child:  Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey, width: 1), // Border color & width
+                                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                                  ),
+                                  height:400,
+                                  child: MultiSelectParts(
+                                  parts: parts,
+                                  onSelectionChanged:(List<MachinePart> newSelectedParts){
+                                    selectedParts=newSelectedParts;
+
+                                  }
+                              ))):SizedBox(height: 0),
                             ],
                           )
                       )
@@ -246,8 +274,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                 ),
               ),
 
-              Expanded(
-                flex: 1,
+              Container(
+                height: 50,
                 child: Row(
                     mainAxisAlignment: (status==null) ? MainAxisAlignment.center :  MainAxisAlignment.spaceAround,
                     children: [
@@ -290,7 +318,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
               // SizedBox(height: 50),
               // Display based on conditions,
             ],
-          );
+          ));
         }
       },
     );

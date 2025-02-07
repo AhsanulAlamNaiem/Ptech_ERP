@@ -1,71 +1,112 @@
-import 'package:flutter/material.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
-import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'dart:math';
 
-import '../../services/appResources.dart';
+import 'package:flutter/material.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ptech_erp/services/app_provider.dart';
 
 class MachinePart {
+  final int id;
   final String name;
-  int quantity;
+  final double price;
+  int availableQuantity; // Stock quantity from API
+  int selectedQuantity;  // Quantity user selects
+  final int company;
 
-  MachinePart({required this.name, this.quantity = 0});
+  MachinePart({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.availableQuantity,
+    required this.company,
+    this.selectedQuantity = 0,
+  });
+
+  // Convert JSON to MachinePart object
+  factory MachinePart.fromJson(Map<String, dynamic> json) {
+    return MachinePart(
+      id: json['id'],
+      name: json['name'],
+      price: double.parse(json['price']),  // Convert to double
+      availableQuantity: json['quantity'],
+      company: json['company'],
+    );
+  }
 }
 
-Widget multiSelectDropDown({ required List<MachinePart> parts, required Function setSelectedPartslist}){
+class MultiSelectParts extends StatefulWidget {
+  final List<MachinePart> parts;
+  final Function(List<MachinePart>) onSelectionChanged;
+
+  const MultiSelectParts({
+    Key? key,
+    required this.parts,
+    required this.onSelectionChanged,
+  }) : super(key: key);
+
+  @override
+  _MultiSelectPartsState createState() => _MultiSelectPartsState();
+}
+
+class _MultiSelectPartsState extends State<MultiSelectParts> {
   List<MachinePart> selectedParts = [];
-  return Expanded(
-    flex: 5,
-    child: Card(
-      child: Container(
-          width: double.infinity,
-          child: Padding(padding: EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10), // Rounded corners
-                        border: Border.all(color: AppColors.disabledMainColor, width: 1), // Border styling
-                      ),
-                      child: MultiSelectDialogField(
-                        title: Text("Select Broken Parts"),
 
-                        items: parts.map((part) => MultiSelectItem<MachinePart>(part, part.name,)).toList(),
-
-                        onConfirm: (values) {
-                          selectedParts = values;
-                          setSelectedPartslist(selectedParts);
-                        },
-                      )),
-                ],
-              )
-          )
-      ),
-    ),
-  );
-}
-
-Widget addQuantity({ required List<MachinePart> selectedParts, required Function setSelectedPartslist}){
-    return               Column(
-      children: selectedParts.map((part) {
-        return Row(
+  @override
+  Widget build(BuildContext context) {
+    return  Padding(padding: EdgeInsets.all(10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: Text(part.name)),
-            SizedBox(
-              width: 60,
-              child: TextField(
+            Container(
+                height: 46,
+                child:MultiSelectDialogField(
+                  chipDisplay: MultiSelectChipDisplay.none(),
+                  items: widget.parts
+                      .map((part) => MultiSelectItem<MachinePart>(part, part.name))
+                      .toList(),
+          title: Text("Add Parts"),
+          searchable: true,
+          buttonText: Text("Select Broken Parts"),
+          onConfirm: (values) {
+            setState(() {
+              selectedParts = List<MachinePart>.from(values);
+            });
+            widget.onSelectionChanged(selectedParts);
+            // context.read<AppProvider>().updateSelectedParts(newSelectedParts: selectedParts);
+          },
+        )),
+        SizedBox(height: 10),
+        // Show selected parts with quantity input
+        selectedParts.isEmpty? SizedBox(height: 0,):
+        Container(height: min((selectedParts.length)*44,400),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey, width: 1), // Border color & width
+              borderRadius: BorderRadius.circular(10), // Rounded corners
+            ),
+            child:  ListView.builder(
+            itemCount: selectedParts.length,
+            itemBuilder: (context, index) {
+              MachinePart part = selectedParts[index];
+              return Padding(padding: EdgeInsets.all(5),
+              child: SizedBox(height: 35,
+              child:  TextField(
+                style: TextStyle(fontSize: 13),
                 keyboardType: TextInputType.number,
                 onChanged: (val) {
                   setState(() {
-                    part.quantity = int.tryParse(val) ?? 0;
+                    part.selectedQuantity = int.tryParse(val) ?? 0;
                   });
                 },
-                decoration: InputDecoration(hintText: "Qty"),
-              ),
-            ),
-          ],
-        );
-      }).toList(),
-    );
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  label: Text("Used qty of ${part.name}", style: TextStyle(fontSize: 13),),
+                ),
+              )));
+            }
+
+        )),
+      ],
+    ));
+  }
 }

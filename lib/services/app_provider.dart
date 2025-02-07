@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ptech_erp/screens/Scanning/interaction_widgets.dart';
 
 import '../screens/Scanning/after_scan_page.dart';
 import 'database_helper.dart';
@@ -12,6 +13,13 @@ class AppProvider extends ChangeNotifier{
   List<Map<String, dynamic>> notifications = [];
   int index = 0;
   String? designation;
+  List<MachinePart> selectedParts = [];
+
+  updateSelectedParts({required List<MachinePart> newSelectedParts}){
+    selectedParts = newSelectedParts;
+    notifyListeners();
+  }
+
 
   updateDesignation({ required String newDesignation}){
     designation = newDesignation;

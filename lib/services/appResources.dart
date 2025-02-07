@@ -140,6 +140,7 @@ class AppApis{
   static const String BreakDownLogs = 'https://machine-maintenance.ddns.net/api/maintenance/breakdown-logs/';
   static const String Machines = 'https://machine-maintenance.ddns.net/api/maintenance/machines/';
   static const String getProblemCategory = 'https://machine-maintenance.ddns.net/api/maintenance/problem-category-type/';
+  static const String getMachineParts = 'https://machine-maintenance.ddns.net/api/inventory/machineparts/';
 }
 
 

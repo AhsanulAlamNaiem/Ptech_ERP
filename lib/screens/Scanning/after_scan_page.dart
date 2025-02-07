@@ -69,12 +69,12 @@ class _AfterScanPageState extends State<AfterScanPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                      flex: 5,
+                      flex: 6,
                       child: MachineDetailsPage()
                   ),
 
                   Expanded(
-                      flex: 5,
+                      flex: 8,
                       child: AfterScanInteractionsPage()
                   )
                 ],
