@@ -36,7 +36,6 @@ class MachinePart {
   // Convert list of MachineParts to required JSON structure
   static List<Map<String, dynamic>> formatPartsListForAPICall({
     required List<MachinePart> parts,
-    required int mechanicId,
     required int breakdownId,
   }) {
     return parts.map((part) {
@@ -44,7 +43,6 @@ class MachinePart {
         "quantity_used": part.selectedQuantity,
         "remarks": "",
         "part": part.id,
-        "mechanic": mechanicId,
         "breakdown": breakdownId,
         "company": part.company,
       };

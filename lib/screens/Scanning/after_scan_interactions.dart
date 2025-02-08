@@ -34,11 +34,14 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
   String? questionText;
   String? status;
   String? designation;
+  String? userId;
 
 
   Future<void> getDesignation() async {
     final storage = FlutterSecureStorage();
     final newDesignation = await storage.read(key: AppSecuredKey.designation);
+    final newUserId = await storage.read(key: AppSecuredKey.id);
+    userId = newUserId;
     designation = newDesignation;
   }
 
@@ -194,8 +197,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                     setState(() {
                                       selectedParts=newSelectedParts;
                                       print("MMachineParts");
-                                      print(MachinePart.formatPartsListForAPICall(parts: selectedParts, mechanicId: 2, breakdownId: 3));
-                                      print(MachinePart.formatPartsListForAPICall(parts: newSelectedParts, mechanicId: 2, breakdownId: 3));
+                                      print(MachinePart.formatPartsListForAPICall(parts: selectedParts, breakdownId: 3));
+                                      print(MachinePart.formatPartsListForAPICall(parts: newSelectedParts, breakdownId: 3));
                                     });
                                   }
                               )):SizedBox(height: 0),
@@ -221,6 +224,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                             ),
                             onPressed: () {
                               print("$machine \n${status}\n$strSelectedSubCategory\nwillupdatebreakdown: ${designation=='Supervisor' && status =='Active'}");
+                              print("sending requests.. .");
                               updateMachineStatus(
                                   usedPartsQtyList: selectedParts,
                                   status: status=='Repair'?"maintenance":status!.toLowerCase(),
@@ -273,7 +277,6 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       "last_repairing_start": (status==AppMachineStatus.maintenance)? currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z": "${machine["last_repairing_start"]}",
       "last_breakdown_start": (status==AppMachineStatus.broken)?  currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z" :"${machine["last_breakdown_start"]}",
       "last_problem": "$problemIndex",
-      "mechanic": ""
     };
 
     DateTime startTime = DateTime.parse("${machine['last_breakdown_start']}");
@@ -299,10 +302,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       print("Status supposed to be updated to $body");
       final response = await http.patch(url,body: body);
       print( "${response.statusCode} ${response.body}");
-      String successMessage = (response.statusCode==200)? "Status Updated": "status NOT updated";
-      // if(response.statusCode ==200){
-      //   Provider.of<AppProvider>(context, listen: true).updateMachineData(jsonDecode(response.body));
-      // }
+
       if (willUpdateBreakdown) {
         final breakdownResponse =
         await http.post(Uri.parse(AppApis.BreakDownLogs), body: breakdownBody);
@@ -310,10 +310,10 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
         print(breakdownResponse.statusCode);
         print("Breakdown updated ${breakdown}");
         if(usedPartsQtyList.isNotEmpty) {
-          final formattedPartsQtyList =jsonEncode(MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList, mechanicId: machine['mechanic']??1, breakdownId: breakdown['id']??2));
+          final formattedPartsQtyList = jsonEncode(MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList, breakdownId: breakdown['id']??2));
           print(" ok: $formattedPartsQtyList");
           final partsResponse = await http.post(
-              Uri.parse(AppApis.bulPartsUsage), body: formattedPartsQtyList);
+              Uri.parse(AppApis.bulkPartsUsage), headers: {"content-type": "application/json"}, body: formattedPartsQtyList);
           print(" parts resp: ${partsResponse.body}");
         }
 
@@ -322,17 +322,16 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       }
 
 
-
     } catch (e) {
       print("Error: $e");
       final successMessage = "An error occurred while updating status.";
     }
     setState(() {
       isPatching = false;
-    });s
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("$successMessage"),
+        content: Text("Status May be Updated! Scan again to see the update."),
         action: SnackBarAction(
           label: 'Close',
           onPressed: () {
