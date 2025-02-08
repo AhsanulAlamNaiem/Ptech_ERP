@@ -32,7 +32,26 @@ class MachinePart {
       company: json['company'],
     );
   }
+
+  // Convert list of MachineParts to required JSON structure
+  static List<Map<String, dynamic>> formatPartsListForAPICall({
+    required List<MachinePart> parts,
+    required int mechanicId,
+    required int breakdownId,
+  }) {
+    return parts.map((part) {
+      return {
+        "quantity_used": part.selectedQuantity,
+        "remarks": "",
+        "part": part.id,
+        "mechanic": mechanicId,
+        "breakdown": breakdownId,
+        "company": part.company,
+      };
+    }).toList();
+  }
 }
+
 
 class MultiSelectParts extends StatefulWidget {
   final List<MachinePart> parts;
@@ -79,12 +98,14 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
         SizedBox(height: 10),
         // Show selected parts with quantity input
         selectedParts.isEmpty? SizedBox(height: 0,):
-        Container(height: min((selectedParts.length)*44,400),
+        Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey, width: 1), // Border color & width
               borderRadius: BorderRadius.circular(10), // Rounded corners
             ),
             child:  ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
             itemCount: selectedParts.length,
             itemBuilder: (context, index) {
               MachinePart part = selectedParts[index];
@@ -96,6 +117,8 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
                 onChanged: (val) {
                   setState(() {
                     part.selectedQuantity = int.tryParse(val) ?? 0;
+                    print("Part quantity: ${part.selectedQuantity}");
+                    widget.onSelectionChanged(selectedParts);
                   });
                 },
                 decoration: InputDecoration(

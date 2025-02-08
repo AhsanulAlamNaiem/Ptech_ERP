@@ -141,6 +141,8 @@ class AppApis{
   static const String Machines = 'https://machine-maintenance.ddns.net/api/maintenance/machines/';
   static const String getProblemCategory = 'https://machine-maintenance.ddns.net/api/maintenance/problem-category-type/';
   static const String getMachineParts = 'https://machine-maintenance.ddns.net/api/inventory/machineparts/';
+  static const String bulPartsUsage = 'https://machine-maintenance.ddns.net/api/inventory/bulk-create-parts-usage/';
+
 }
 
 

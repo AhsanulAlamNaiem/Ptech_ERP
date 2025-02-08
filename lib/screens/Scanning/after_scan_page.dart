@@ -56,29 +56,26 @@ class _AfterScanPageState extends State<AfterScanPage> {
   @override
   Widget build(BuildContext context) {
     double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
-    return Consumer<AppProvider>(
-      builder: (context, appProvider, child) {
-        if (appProvider.isPatching) {
+        if (context.read<AppProvider>().isPatching) {
           print("patching now");
           return Center(child: CircularProgressIndicator());
         } else {
-          if(appProvider.machine!=null){
+          if(context.read<AppProvider>().machine!=null){
               return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
+              child: SingleChildScrollView( child:  Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                      flex: 6,
+                  Container(
                       child: MachineDetailsPage()
                   ),
 
-                  Expanded(
-                      flex: 8,
+                  Container(
                       child: AfterScanInteractionsPage()
+                    // child: TextField(),
                   )
                 ],
-              ),
+              )),
             );
           } else{
             return Center(child: Column(children: [
@@ -101,8 +98,6 @@ class _AfterScanPageState extends State<AfterScanPage> {
           }
 
         }
-      },
-    );
   }
 }
 
