@@ -180,7 +180,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                       });
                                     },
                                   )),
-                              (status==null || designation ==AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance) && !(designation == AppDesignations.mechanic)?
+                              (status==null || designation ==AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance) && !(designation == AppDesignations.mechanic) && !(designation == AppDesignations.superVisor && machineStatus==AppMachineStatus.broken)?
                               isFetchingProblemCategory?
                               Center(child: CircularProgressIndicator()):
                               Container(
@@ -212,9 +212,9 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                     mainAxisAlignment: (status==null) ? MainAxisAlignment.center :  MainAxisAlignment.spaceAround,
                     children: [
                      (status==null)? SizedBox(height: 0):
-                      SizedBox(
+                     isPatching? CircularProgressIndicator(): SizedBox(
                           width: halfScreenWidth + halfScreenWidth *0.035, // Set button width to 50% of screen
-                          child: isPatching? CircularProgressIndicator(): ElevatedButton(
+                          child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.mainColor,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
@@ -310,10 +310,10 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
         print(breakdownResponse.statusCode);
         print("Breakdown updated ${breakdown}");
         if(usedPartsQtyList.isNotEmpty) {
-          final formattedPartsQtyList = MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList, mechanicId: machine['mechanic']??1, breakdownId: breakdown['id']??2);
+          final formattedPartsQtyList =jsonEncode(MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList, mechanicId: machine['mechanic']??1, breakdownId: breakdown['id']??2));
           print(" ok: $formattedPartsQtyList");
           final partsResponse = await http.post(
-              Uri.parse(AppApis.bulPartsUsage), body: jsonEncode(formattedPartsQtyList));
+              Uri.parse(AppApis.bulPartsUsage), body: formattedPartsQtyList);
           print(" parts resp: ${partsResponse.body}");
         }
 
@@ -329,7 +329,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     }
     setState(() {
       isPatching = false;
-    });
+    });s
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("$successMessage"),
