@@ -31,6 +31,7 @@ class _AfterScanPageState extends State<AfterScanPage> {
   String? questionText;
   String? status;
   double? halfScreenWidth;
+  final FocusNode _focusNode = FocusNode();
 
 
   @override
@@ -71,7 +72,8 @@ class _AfterScanPageState extends State<AfterScanPage> {
           Container(
             child: AfterScanInteractionsPage()
             // child: TextField(),
-          )
+          ),
+          // Container(child: TextField())
         ],
       )),
     );
