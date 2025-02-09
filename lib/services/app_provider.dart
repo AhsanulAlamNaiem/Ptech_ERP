@@ -41,17 +41,8 @@ class AppProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  loadMachineData() async {
-    updatePatchingState(true);
-
-    final fetchedMachine = await funcFetchMachineDetails(model!);
-
-    if (fetchedMachine == null || fetchedMachine.isEmpty) {
-      machine = null;
-    } else {
-      machine = Map.from(fetchedMachine);
-    }
-    updatePatchingState(false);
+  updateMachineDatawithOutNotification(Map newMachine) async{
+    machine = newMachine;
   }
 
 

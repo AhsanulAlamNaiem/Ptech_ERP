@@ -30,6 +30,99 @@ class _AfterScanPageState extends State<AfterScanPage> {
 
   String? questionText;
   String? status;
+  double? halfScreenWidth;
+
+
+  @override
+  void initState() {
+    super.initState();
+    isFetchingProblemCategory = false;
+    isPatching=false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView( child:  Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconButton(onPressed: ()=>_refreshData(), icon: Icon(Icons.refresh)),
+          Container(
+              child: FutureBuilder<Map?>(
+                  future: funcFetchMachineDetails(context.read<AppProvider>().qrCode!),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if(snapshot.hasData){
+                      context.read<AppProvider>().updateMachineDatawithOutNotification(snapshot.data!);
+                      return RefreshIndicator(onRefresh:_refreshData ,child: MachineDetailsPage());
+                    }
+                    else if (snapshot.hasError){
+                      return noDataScreen(text: "Something Went Wrong, make sure you are Connected.");
+                    }
+                    else{
+                      return noDataScreen(text: "No data Found");
+                    }
+                  }
+              )
+          ),
+          Container(
+            child: AfterScanInteractionsPage()
+            // child: TextField(),
+          )
+        ],
+      )),
+    );
+  }
+
+  Widget noDataScreen({required String text}){
+    return Center(child: Column(children: [
+      Spacer(),
+      Text(text,style: AppStyles.textH2,),
+      Spacer(),
+      SizedBox(
+          width: halfScreenWidth!-halfScreenWidth!*0.05, // Set button width to 50% of screen
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.mainColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
+            ),
+            onPressed: () {
+              context.read<AppProvider>().updateScannerState(scanningState: true);
+            }, child: Text("Scan Again",  style: AppStyles.buttonText,),
+          )),
+      SizedBox(height: 15,)
+    ]));
+  }
+
+  Future<Map?> funcFetchMachineDetails(String model) async {
+    final queryParams = {
+      'machine_id': '$model'
+    };
+    final url = Uri.parse(AppApis.Machines).replace(queryParameters: queryParams);
+    print(url);
+
+    final headers = {'Content-Type': 'application/json'};
+    final response = await http.get(url);
+
+    print(response.statusCode);
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonDecodedData = jsonDecode(response.body);
+      print("Json data: $jsonDecodedData");
+      Map machineObject = jsonDecodedData[0];
+      print("machine Object: $machineObject");
+      return machineObject;
+    }
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {// Refresh the data by calling the API again
+    });
+  }
+
 
   Future<String?> getDesignation() async {
     final storage = FlutterSecureStorage();
@@ -44,81 +137,7 @@ class _AfterScanPageState extends State<AfterScanPage> {
       selectedSubCategory = null; // Reset subcategory selection
     });
   }
-
-  @override
-  void initState() {
-    super.initState();
-    Provider.of<AppProvider>(context, listen: false).loadMachineData();
-    isFetchingProblemCategory = false;
-    isPatching=false;
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
-        if (isPatching) {
-          print("patching now");
-          return Center(child: CircularProgressIndicator());
-        } else {
-          if(context.read<AppProvider>().machine!=null){
-              return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView( child:  Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                      child: MachineDetailsPage()
-                  ),
-
-                  Container(
-                      child: AfterScanInteractionsPage()
-                    // child: TextField(),
-                  )
-                ],
-              )),
-            );
-          } else{
-            return Center(child: Column(children: [
-              Spacer(),
-              Text("No Data Found",style: AppStyles.textH2,),
-              Spacer(),
-              SizedBox(
-                  width: halfScreenWidth-halfScreenWidth*0.05, // Set button width to 50% of screen
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.mainColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                    ),
-                    onPressed: () {
-                      context.read<AppProvider>().updateScannerState(scanningState: true);
-                    }, child: Text("Scan Again",  style: AppStyles.buttonText,),
-                  )),
-              SizedBox(height: 15,)
-            ]));
-          }
-
-        }
-  }
 }
 
-Future<Map?> funcFetchMachineDetails(String model) async {
-  final queryParams = {
-    'machine_id': '$model'
-  };
-  final url = Uri.parse(AppApis.Machines).replace(queryParameters: queryParams);
-  print(url);
 
-  final headers = {'Content-Type': 'application/json'};
-  final response = await http.get(url);
 
-  print(response.statusCode);
-
-  if (response.statusCode == 200) {
-    List<dynamic> jsonDecodedData = jsonDecode(response.body);
-    print("Json data: $jsonDecodedData");
-    Map machineObject = jsonDecodedData[0];
-    print("machine Object: $machineObject");
-    return machineObject;
-  }
-}

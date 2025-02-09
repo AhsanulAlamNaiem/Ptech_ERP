@@ -64,7 +64,8 @@ class _BreakdownPageState extends State<BreakdownPage> {
 
   Future<void> _refreshData() async {
     setState(() {
-      futurelogs = fetchlogs(); // Refresh the data by calling the API again
+      // futurelogs = fetchlogs();
+      print("new refreash");
     });
   }
 
@@ -119,9 +120,11 @@ class _BreakdownPageState extends State<BreakdownPage> {
                                           Text("Machine: ${logs[index]["machine"]}", style: AppStyles.bodyTextBold)
                                         ]
                                     ),
+
                                     // Text("${logs[index]["status"]}")
 
-                                  ])
+                                  ]),
+
                             ]
                         )
                         ]
