@@ -20,7 +20,6 @@ class AppProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-
   updateDesignation({ required String newDesignation}){
     designation = newDesignation;
     notifyListeners();
@@ -52,9 +51,7 @@ class AppProvider extends ChangeNotifier{
     } else {
       machine = Map.from(fetchedMachine);
     }
-
     updatePatchingState(false);
-    notifyListeners();
   }
 
 

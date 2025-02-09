@@ -50,13 +50,14 @@ class _AfterScanPageState extends State<AfterScanPage> {
     super.initState();
     Provider.of<AppProvider>(context, listen: false).loadMachineData();
     isFetchingProblemCategory = false;
+    isPatching=false;
   }
 
 
   @override
   Widget build(BuildContext context) {
     double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
-        if (context.read<AppProvider>().isPatching) {
+        if (isPatching) {
           print("patching now");
           return Center(child: CircularProgressIndicator());
         } else {
