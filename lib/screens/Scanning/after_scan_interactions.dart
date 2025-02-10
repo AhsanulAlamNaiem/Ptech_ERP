@@ -10,6 +10,9 @@ import '../../services/appResources.dart';
 import 'interaction_widgets.dart';
 
 class AfterScanInteractionsPage extends StatefulWidget {
+  Map? machine;
+  AfterScanInteractionsPage({this.machine, super.key});
+
   @override
   _AfterScanInteractionsPageState createState() => _AfterScanInteractionsPageState();
 }
@@ -87,7 +90,20 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final machine = context.read<AppProvider>().machine!;
+    final newMachine = context.read<AppProvider>().machine;
+    if(newMachine==null){
+      return Container(
+          child: Card(
+          child: Container(
+          width: double.infinity,
+          child: Padding(padding: EdgeInsets.all(10),
+              child: Column(
+                  children: [
+                  // CircularProgressIndicator()
+              ])))));
+    }
+    final machine = newMachine!;
+
     double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
 
         if (isFetchingProblemCategory) {
@@ -232,6 +248,9 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                   problemIndex: selectedSubCategoryIndex,
                                   willUpdateBreakdown: designation==AppDesignations.superVisor && status=='Active',
                               );
+                              setState(() {
+
+                              });
                             }, child: Text("Set to ${status}", style: AppStyles.buttonText),
                           ) ),
 

@@ -147,6 +147,7 @@ class _LogInPageState extends State<LogInPage> {
 
             children: [
               TextFormField(
+                autofillHints: [AutofillHints.email],
                 // validator: (val)=> val!.isEmpty || !val.contains("@")?"enter a valid email":null,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.email),
@@ -160,7 +161,7 @@ class _LogInPageState extends State<LogInPage> {
               ),
               SizedBox(height: 20),
               TextField(
-
+                autofillHints: [AutofillHints.password],
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                       prefixIcon: Icon(Icons.lock),

@@ -38,7 +38,6 @@ class AppProvider extends ChangeNotifier{
 
   updateMachineData(Map newMachine) async{
     machine = newMachine;
-    notifyListeners();
   }
 
   updateMachineDatawithOutNotification(Map newMachine) async{

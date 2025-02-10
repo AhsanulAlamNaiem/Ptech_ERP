@@ -26,12 +26,10 @@ class _AfterScanPageState extends State<AfterScanPage> {
   dynamic strSelectedSubCategory;
 
   bool isFetchingProblemCategory = true;
-  String? successMessage;
 
-  String? questionText;
   String? status;
   double? halfScreenWidth;
-  final FocusNode _focusNode = FocusNode();
+  Map machine = {};
 
 
   @override
@@ -46,7 +44,7 @@ class _AfterScanPageState extends State<AfterScanPage> {
     halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView( child:  Column(
+      child:  SingleChildScrollView( child:  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // IconButton(onPressed: ()=>_refreshData(), icon: Icon(Icons.refresh)),
@@ -57,6 +55,7 @@ class _AfterScanPageState extends State<AfterScanPage> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
                     } else if(snapshot.hasData){
+                      machine = snapshot.data!;
                       context.read<AppProvider>().updateMachineDatawithOutNotification(snapshot.data!);
                       return RefreshIndicator(onRefresh:_refreshData ,child: MachineDetailsPage());
                     }
@@ -70,7 +69,7 @@ class _AfterScanPageState extends State<AfterScanPage> {
               )
           ),
           Container(
-            child: AfterScanInteractionsPage()
+            child: AfterScanInteractionsPage(machine: machine)
             // child: TextField(),
           ),
           // Container(child: TextField())
