@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Image.asset('assets/images/ppclogotransparent.png',
                                 width: 50, height: 50,fit: BoxFit.cover),
                             Text('Ptech ERP - Panacea Private Consultancy', style: AppStyles.bodyTextgray,),
-                            Text('Version 1.2.0', style: AppStyles.bodyTextgray,),
+                            Text('Version 1.2.1', style: AppStyles.bodyTextgray,),
                             Divider(
                               color: Colors.transparent,      // Color of the line
                               thickness: 0.0,          // Thickness of the line
