@@ -138,9 +138,11 @@ class _LogInPageState extends State<LogInPage> {
           ),
           centerTitle: true,
         ))),
-        body: Padding(
+        body: SingleChildScrollView(child:  Padding(
           padding: const EdgeInsets.fromLTRB(16.0,40,16,0),
-          child: Column( children: [ Column(
+          child: Container(
+              height: MediaQuery.of(context).size.height-165,
+              child: Column( children: [ Column(
             crossAxisAlignment: CrossAxisAlignment.center,
 
             children: [
@@ -207,6 +209,6 @@ class _LogInPageState extends State<LogInPage> {
                 width: 50, height: 50,fit: BoxFit.cover),
             Text("Ptech ERP - Panacea Private Consulting", style: TextStyle(color: AppColors.fontColorGray)),
             SizedBox(height: 10)])
-        ));
+        ))));
   }
 }

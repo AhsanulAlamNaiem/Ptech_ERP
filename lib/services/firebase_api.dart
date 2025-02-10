@@ -23,7 +23,9 @@ class FirebaseApi {
     print("designation: $designation");
 
 
-    designation==AppDesignations.mechanic?await _firebaseMessaging.subscribeToTopic('mechanics'):_firebaseMessaging.unsubscribeFromTopic("mechanics");
+    designation==AppDesignations.mechanic?
+    await _firebaseMessaging.subscribeToTopic('mechanics'):
+    _firebaseMessaging.unsubscribeFromTopic("mechanics");
 
 
     // Initialize local notifications for foreground handling
