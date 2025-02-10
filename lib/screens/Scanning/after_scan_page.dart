@@ -49,7 +49,7 @@ class _AfterScanPageState extends State<AfterScanPage> {
       child: SingleChildScrollView( child:  Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(onPressed: ()=>_refreshData(), icon: Icon(Icons.refresh)),
+          // IconButton(onPressed: ()=>_refreshData(), icon: Icon(Icons.refresh)),
           Container(
               child: FutureBuilder<Map?>(
                   future: funcFetchMachineDetails(context.read<AppProvider>().qrCode!),

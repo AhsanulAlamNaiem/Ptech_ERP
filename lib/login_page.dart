@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:ptech_erp/services/app_provider.dart';
+import 'package:ptech_erp/services/firebase_api.dart';
 import 'dart:convert';
 import 'services/appResources.dart';
 
@@ -64,6 +65,7 @@ class _LogInPageState extends State<LogInPage> {
               key: AppSecuredKey.company, value: employeeInfo["company"]);
           await storage.write(
               key: AppSecuredKey.id, value: data['user_id'].toString());
+          await FirebaseApi().initNotifications();
 
 
           showDialog(

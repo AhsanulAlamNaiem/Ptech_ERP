@@ -18,11 +18,12 @@ class FirebaseApi {
     await _firebaseMessaging.requestPermission();
     final fCMToken = await _firebaseMessaging.getToken();
     print('Token: $fCMToken');
-    await _firebaseMessaging.subscribeToTopic('mechanics');
 
     final designation = await storage.read(key: AppSecuredKey.designation);
     print("designation: $designation");
 
+
+    designation==AppDesignations.mechanic?await _firebaseMessaging.subscribeToTopic('mechanics'):_firebaseMessaging.unsubscribeFromTopic("mechanics");
 
 
     // Initialize local notifications for foreground handling
@@ -30,21 +31,17 @@ class FirebaseApi {
     // Listen to foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print('Message received in foreground: ${message.notification?.title}');
-      if(designation == "Mechanic"  || designation == "Admin Officer") {
         await _storeNotification(message);
         _showNotification(
           message.notification?.title,
           message.notification?.body,
         );
-      }
     });
 
-
-
     // Handle background messages
-    if(designation == "Mechanic"  || designation == "Admin Officer") {
+
       FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
-    }
+
 
     // Handle notification taps in Background  state
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
