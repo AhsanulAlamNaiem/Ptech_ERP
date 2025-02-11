@@ -134,17 +134,16 @@ class AppMachineStatus{
   static const String maintenance = "maintenance";
 }
 
+
 class AppApis{
-  static const String login = 'https://machine-maintenance.ddns.net/api/user_management/login/';
-  static const String employeeDetails = 'https://machine-maintenance.ddns.net/api/user_management/employee-details/';
-  static const String BreakDownLogs = 'https://machine-maintenance.ddns.net/api/maintenance/breakdown-logs/';
-  static const String Machines = 'https://machine-maintenance.ddns.net/api/maintenance/machines/';
-  static const String getProblemCategory = 'https://machine-maintenance.ddns.net/api/maintenance/problem-category-type/';
-  static const String getMachineParts = 'https://machine-maintenance.ddns.net/api/inventory/machineparts/';
-  static const String bulkPartsUsage = 'https://machine-maintenance.ddns.net/api/inventory/bulk-create-parts-usage/';
-  static const String singlePartsUsage = 'https://machine-maintenance.ddns.net/api/inventory/bulk-create-parts-usage/';
-
-
+  static const String login = 'https://api.panamach.com/user_management/login/';
+  static const String employeeDetails = 'https://api.panamach.com/user_management/employee-details/';
+  static const String BreakDownLogs = 'https://api.panamach.com/maintenance/breakdown-logs/';
+  static const String Machines = 'https://api.panamach.com/maintenance/machines/';
+  static const String getProblemCategory = 'https://api.panamach.com/maintenance/problem-category-type/';
+  static const String getMachineParts = 'https://api.panamach.com/inventory/machineparts/';
+  static const String bulkPartsUsage = 'https://api.panamach.com/inventory/bulk-create-parts-usage/';
+  static const String singlePartsUsage = 'https://api.panamach.com/inventory/bulk-create-parts-usage/';
 }
 
 

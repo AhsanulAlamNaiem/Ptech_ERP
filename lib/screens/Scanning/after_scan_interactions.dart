@@ -46,6 +46,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     final newUserId = await storage.read(key: AppSecuredKey.id);
     userId = newUserId;
     designation = newDesignation;
+    print("Userid: $userId");
   }
 
   void onCategoryChange(int categoryId) {
@@ -195,7 +196,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                         selectedSubCategory = newValue;
                                         selectedSubCategoryIndex = int.parse(newValue!);
                                         strSelectedSubCategory = subCategories.firstWhere((item)=>item['id']==selectedSubCategoryIndex)['name'];
-                                        print(strSelectedSubCategory);
+                                        print(selectedSubCategoryIndex);
                                       });
                                     },
                                   )),
@@ -213,8 +214,6 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                     setState(() {
                                       selectedParts=newSelectedParts;
                                       print("MMachineParts");
-                                      print(MachinePart.formatPartsListForAPICall(parts: selectedParts, breakdownId: 3));
-                                      print(MachinePart.formatPartsListForAPICall(parts: newSelectedParts, breakdownId: 3));
                                     });
                                   }
                               )):SizedBox(height: 0),
@@ -242,9 +241,13 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                               print("$machine \n${status}\n$strSelectedSubCategory\nwillupdatebreakdown: ${designation=='Supervisor' && status =='Active'}");
                               print("sending requests.. .");
                               updateMachineStatus(
+                                stateUpdater: (){
+                                  setState(() {
+
+                                  });
+                                },
                                   usedPartsQtyList: selectedParts,
                                   status: status=='Repair'?"maintenance":status!.toLowerCase(),
-                                  lastProblem: strSelectedSubCategory??"Null",
                                   problemIndex: selectedSubCategoryIndex,
                                   willUpdateBreakdown: designation==AppDesignations.superVisor && status=='Active',
                               );
@@ -277,7 +280,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
 
   //
   Future<void> updateMachineStatus({
-    required String lastProblem,
+    required Function stateUpdater,
     required String status,
     required List<MachinePart> usedPartsQtyList,
     required int problemIndex,
@@ -293,10 +296,18 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
 
     Map body = {
       "status": status,
-      "last_repairing_start": (status==AppMachineStatus.maintenance)? currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z": "${machine["last_repairing_start"]}",
-      "last_breakdown_start": (status==AppMachineStatus.broken)?  currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z" :"${machine["last_breakdown_start"]}",
-      "last_problem": "$problemIndex",
     };
+
+    if(designation==AppDesignations.mechanic){
+      body["mechanic"]=userId;
+      body["last_repairing_start"]=currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z";
+    } else if(status==AppMachineStatus.broken){
+      body["last_breakdown_start"]=currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z";
+    }
+    if(problemIndex>0){
+      body["last_problem"]=problemIndex.toString();
+    }
+
 
     DateTime startTime = DateTime.parse("${machine['last_breakdown_start']}");
     DateTime endTime = DateTime.parse(DateTime.now().toUtc().toString().split('.').first +'Z');
@@ -308,11 +319,12 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       "lost_time": formattedDuration,
       "comments": "",
       "machine": "${machine['id']}",
-      "mechanic": "",
+      "mechanic": "${machine['mechanic']}",
       "operator": "",
       "problem_category": "${machine['category']}",
       "location": "1",
       "line": "${machine['line']}",
+
     };
 
     try {
@@ -320,16 +332,15 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       print(url);
       print("Status supposed to be updated to $body");
       final response = await http.patch(url,body: body);
-      print( "${response.statusCode} ${response.body}");
+      print( " status update: ${response.statusCode} ${response.body}");
 
       if (willUpdateBreakdown) {
         final breakdownResponse =
         await http.post(Uri.parse(AppApis.BreakDownLogs), body: breakdownBody);
         final breakdown = jsonDecode(breakdownResponse.body);
-        print(breakdownResponse.statusCode);
-        print("Breakdown updated ${breakdown}");
+        print("Breakdown updated: ${breakdownResponse.statusCode} ${breakdown}");
         if(usedPartsQtyList.isNotEmpty) {
-          final formattedPartsQtyList = jsonEncode(MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList, breakdownId: breakdown['id']??2));
+          final formattedPartsQtyList = jsonEncode(MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList, mechanicID: machine["mechanic"], breakdownId: breakdown['id']??2));
           print(" ok: $formattedPartsQtyList");
           final partsResponse = await http.post(
               Uri.parse(AppApis.bulkPartsUsage), headers: {"content-type": "application/json"}, body: formattedPartsQtyList);
@@ -354,6 +365,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
         action: SnackBarAction(
           label: 'Close',
           onPressed: () {
+            stateUpdater();
             // Dismiss the snackbar
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },

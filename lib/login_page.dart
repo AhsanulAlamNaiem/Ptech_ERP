@@ -47,6 +47,7 @@ class _LogInPageState extends State<LogInPage> {
 
         print(headers);
         final response = await http.get(employeUrl, headers: headers);
+        print(response.body);
 
         if (response.statusCode == 200) {
           Map employeeInfo = jsonDecode(response.body);
@@ -64,7 +65,7 @@ class _LogInPageState extends State<LogInPage> {
           await storage.write(
               key: AppSecuredKey.company, value: employeeInfo["company"]);
           await storage.write(
-              key: AppSecuredKey.id, value: data['user_id'].toString());
+              key: AppSecuredKey.id, value: employeeInfo['id'].toString());
           await FirebaseApi().initNotifications();
 
 

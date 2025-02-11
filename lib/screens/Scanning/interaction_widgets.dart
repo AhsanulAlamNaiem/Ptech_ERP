@@ -37,6 +37,7 @@ class MachinePart {
   static List<Map<String, dynamic>> formatPartsListForAPICall({
     required List<MachinePart> parts,
     required int breakdownId,
+    required int mechanicID,
   }) {
     return parts.map((part) {
       return {
@@ -45,6 +46,7 @@ class MachinePart {
         "part": part.id,
         "breakdown": breakdownId,
         "company": part.company,
+        "mechanic": mechanicID
       };
     }).toList();
   }
