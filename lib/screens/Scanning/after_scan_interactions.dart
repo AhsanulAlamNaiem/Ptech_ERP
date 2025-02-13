@@ -5,13 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 import '../../services/appResources.dart';
 import 'interaction_widgets.dart';
 
 class AfterScanInteractionsPage extends StatefulWidget {
-  Map? machine;
-  AfterScanInteractionsPage({this.machine, super.key});
 
   @override
   _AfterScanInteractionsPageState createState() => _AfterScanInteractionsPageState();
@@ -91,46 +90,36 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final newMachine = context.read<AppProvider>().machine;
-    if(newMachine==null){
-      return Container(
-          child: Card(
-          child: Container(
-          width: double.infinity,
-          child: Padding(padding: EdgeInsets.all(10),
-              child: Column(
-                  children: [
-                  // CircularProgressIndicator()
-              ])))));
-    }
-    final machine = newMachine!;
+    final machine = context.watch<AppProvider>().machine!;
 
     double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
 
-        if (isFetchingProblemCategory) {
-          return Center(child: CircularProgressIndicator());
-        } else {
-          final machineStatus = machine['status'];
+    if (isFetchingProblemCategory) {
+      return Center(child: CircularProgressIndicator());
+    } else {
+      final machineStatus = machine['status'];
 
-          if (designation == AppDesignations.superVisor) {
-            if (machineStatus == AppMachineStatus.active) {
-              status = "Broken";
-              questionText =
-              'Is the Machine Broken?\nif yes, at first select problem category and then press "Set to $status" Button';
-            }
-            else if (machineStatus == AppMachineStatus.maintenance) {
-              status = "Active";
-              questionText =
-              'Is the Machine Active now?\nif yes, at first select problem category and then press "Set to $status" Button';
-            }
-          } else if (designation == AppDesignations.mechanic && machineStatus == AppMachineStatus.broken) {
-            status = "Repair";
-            questionText =
-            'The Machine is Broken?\nTo set it in Maintenance stage press "Set to $status" Button';
-          }
+      if (designation == AppDesignations.superVisor) {
+        if (machineStatus == AppMachineStatus.active) {
+          status = "Broken";
+          questionText =
+          'Is the Machine Broken?\nif yes, at first select problem category and then press "Set to $status" Button';
+        }
+        else if (machineStatus == AppMachineStatus.maintenance) {
+          status = "Active";
+          questionText =
+          'Is the Machine Active now?\nif yes, at first select problem category and then press "Set to $status" Button';
+        }
+      } else if (designation == AppDesignations.mechanic && machineStatus == AppMachineStatus.broken) {
+        status = "Repair";
+        questionText =
+        'The Machine is Broken?\nTo set it in Maintenance stage press "Set to $status" Button';
+      }
 
 
-          return  Column(
+      return Container(
+          height: max(365,selectedParts.length*45+50),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
@@ -209,28 +198,29 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                     borderRadius: BorderRadius.circular(10), // Rounded corners
                                   ),
                                   child: false? TextField(): MultiSelectParts(
-                                  parts: parts,
-                                  onSelectionChanged:(List<MachinePart> newSelectedParts){
-                                    setState(() {
-                                      selectedParts=newSelectedParts;
-                                      print("MMachineParts");
-                                    });
-                                  }
-                              )):SizedBox(height: 0),
+                                      parts: parts,
+                                      onSelectionChanged:(List<MachinePart> newSelectedParts){
+                                        setState(() {
+                                          selectedParts=newSelectedParts;
+                                          print("MMachineParts");
+                                        });
+                                      }
+                                  )):SizedBox(height: 0),
                             ],
                           )
                       )
                   ),
                 ),
               ),
+              Spacer(),
 
               Container(
                 height: 50,
                 child: Row(
                     mainAxisAlignment: (status==null) ? MainAxisAlignment.center :  MainAxisAlignment.spaceAround,
                     children: [
-                     (status==null)? SizedBox(height: 0):
-                     isPatching? CircularProgressIndicator(): SizedBox(
+                      (status==null)? SizedBox(height: 0):
+                      isPatching? CircularProgressIndicator(): SizedBox(
                           width: halfScreenWidth + halfScreenWidth *0.035, // Set button width to 50% of screen
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -238,6 +228,17 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8.0))),
                             ),
                             onPressed: () {
+                              print(selectedCategoryIndex);
+                              if(selectedCategoryIndex==-1 && machineStatus==AppMachineStatus.active){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      backgroundColor: Colors.red,
+                                    content: Text('No Category Selected'),
+                                    duration: Duration(seconds: 1), // Show for 1 second
+                                  ),
+                                );
+                                return;
+                              }
                               print("$machine \n${status}\n$strSelectedSubCategory\nwillupdatebreakdown: ${designation=='Supervisor' && status =='Active'}");
                               print("sending requests.. .");
                               updateMachineStatus(
@@ -246,10 +247,10 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
 
                                   });
                                 },
-                                  usedPartsQtyList: selectedParts,
-                                  status: status=='Repair'?"maintenance":status!.toLowerCase(),
-                                  problemIndex: selectedSubCategoryIndex,
-                                  willUpdateBreakdown: designation==AppDesignations.superVisor && status=='Active',
+                                usedPartsQtyList: selectedParts,
+                                status: status=='Repair'?"maintenance":status!.toLowerCase(),
+                                problemIndex: selectedSubCategoryIndex,
+                                willUpdateBreakdown: designation==AppDesignations.superVisor && status=='Active',
                               );
                               setState(() {
 
@@ -266,6 +267,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                             ),
                             onPressed: () {
                               context.read<AppProvider>().updateScannerState(scanningState: true);
+                              Navigator.pop(context);
                             }, child: Text("Scan Again",  style: AppStyles.buttonText,),
                           )),
                     ]
@@ -274,8 +276,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
               // SizedBox(height: 50),
               // Display based on conditions,
             ],
-          );
-        }
+          ));
+    }
   }
 
   //
@@ -289,8 +291,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     setState(() {
       isPatching = true;
     });
-
-    final machine =  context.read<AppProvider>().machine!;
+    print("lasfjlasfjlasdfjk");
+    final machine = Provider.of<AppProvider>(context, listen: false).machine!;
 
     final currentTIme = DateTime.now().toUtc().toString().split('.').first;
 
@@ -359,6 +361,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     setState(() {
       isPatching = false;
     });
+    Provider.of<AppProvider>(context, listen: false).reLoadMachineData();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Status May be Updated! Scan again to see the update."),

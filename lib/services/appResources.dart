@@ -146,7 +146,6 @@ class AppApis{
   static const String singlePartsUsage = 'https://api.panamach.com/inventory/bulk-create-parts-usage/';
 }
 
-
 PreferredSize customAppBar({required String title, List<Widget>? action = null , Widget? leading = null}) {
   return PreferredSize(
       preferredSize: Size.fromHeight(50), // Adjust the height as needed

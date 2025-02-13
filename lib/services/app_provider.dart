@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:ptech_erp/screens/Scanning/interaction_widgets.dart';
-
+import 'package:http/http.dart' as http;
 import '../screens/Scanning/after_scan_page.dart';
+import 'appResources.dart';
 import 'database_helper.dart';
 
 class AppProvider extends ChangeNotifier{
@@ -55,6 +58,27 @@ class AppProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  reLoadMachineData() async{
+
+      final queryParams = {
+        'machine_id': '$qrCode'
+      };
+
+      final url = Uri.parse(AppApis.Machines).replace(queryParameters: queryParams);
+      print(url);
+
+      final headers = {'Content-Type': 'application/json'};
+      final response = await http.get(url);
+
+      print(response.statusCode);
+      List<dynamic> jsonDecodedData = jsonDecode(response.body);
+
+        Map machineObject = jsonDecodedData[0];
+        machine = machineObject;
+
+    notifyListeners();
+  }
+
   Future<void> deleteAllNotifications() async {
     await DatabaseHelper().deleteAllNotifications();
     notifications.clear();
@@ -65,5 +89,4 @@ class AppProvider extends ChangeNotifier{
     index = newIndex;
     notifyListeners();
   }
-
 }

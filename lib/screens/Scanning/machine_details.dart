@@ -14,18 +14,14 @@ class _MachineDetailsPageState extends State<MachineDetailsPage> {
 
   Future<String?> getDesignation() async {
     final storage = FlutterSecureStorage();
-
     final designation = await storage.read(key: AppSecuredKey.designation);
-
     return designation;
   }
 
 
   @override
-  Widget build(BuildContext context) {
-    final machine = context
-        .watch<AppProvider>()
-        .machine!;
+  Widget build(BuildContext context){
+    final machine = context.watch<AppProvider>().machine!;
     final machineStatus = machine['status'];
 
     return Padding(
