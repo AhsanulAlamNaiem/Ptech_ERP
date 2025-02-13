@@ -323,7 +323,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       "machine": "${machine['id']}",
       "mechanic": "${machine['mechanic']}",
       "operator": "",
-      "problem_category": "${machine['category']}",
+      "problem_category": "${machine['problem_category']}",
       "location": "1",
       "line": "${machine['line']}",
 
@@ -337,6 +337,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       print( " status update: ${response.statusCode} ${response.body}");
 
       if (willUpdateBreakdown) {
+        print("breakdown supposed to be $breakdownBody");
         final breakdownResponse =
         await http.post(Uri.parse(AppApis.BreakDownLogs), body: breakdownBody);
         final breakdown = jsonDecode(breakdownResponse.body);
