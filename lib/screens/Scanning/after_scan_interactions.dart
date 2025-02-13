@@ -323,7 +323,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       "machine": "${machine['id']}",
       "mechanic": "${machine['mechanic']}",
       "operator": "",
-      "problem_category": "${machine['problem_category']}",
+      "problem_category": "${machine['last_problem']}",
       "location": "1",
       "line": "${machine['line']}",
 
