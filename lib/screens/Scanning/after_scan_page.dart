@@ -43,8 +43,8 @@ class _AfterScanPageState extends State<AfterScanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: customAppBar(title: "Machine", leading: IconButton(onPressed: (){
-          context.read<AppProvider>().updateScannerState(scanningState: true);
           Navigator.pop(context);
+          Provider.of<AppProvider>(context, listen: false).setIndex(0);
           },
             icon: Icon(Icons.arrow_back))),
         body: Padding(

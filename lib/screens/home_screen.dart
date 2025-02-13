@@ -41,12 +41,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Btn("Production", ProductionPage(), Icons.factory),
           Btn("Maintenance", Maintanance(), Icons.handyman),
           Btn("Inventory", InventoryPage(),Icons.assignment),
-          ElevatedButton(onPressed: (){
-             if(designation==AppDesignations.superVisor) {
-               storage.write(key: AppSecuredKey.designation,
+          ElevatedButton(onPressed: () async{
+             final currentDesignation= await storage.read(key: AppSecuredKey.designation);
+             if(currentDesignation==AppDesignations.superVisor) {
+                await storage.write(key: AppSecuredKey.designation,
                    value: AppDesignations.mechanic);
              } else{
-               storage.write(key: AppSecuredKey.designation, value: AppDesignations.superVisor);
+               await storage.write(key: AppSecuredKey.designation, value: AppDesignations.superVisor);
              }
            }, child: Text("change Desg"))
         ]));
