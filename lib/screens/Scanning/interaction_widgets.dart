@@ -6,47 +6,36 @@ import 'package:provider/provider.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 
 class MachinePart {
-  final int id;
+  final int part_id;
   final String name;
-  final double price;
-  int availableQuantity; // Stock quantity from API
-  int selectedQuantity;  // Quantity user selects
-  final int company;
+  int quantity_used;
+  int availableQty;// Quantity user selects
+
 
   MachinePart({
-    required this.id,
+    required this.part_id,
     required this.name,
-    required this.price,
-    required this.availableQuantity,
-    required this.company,
-    this.selectedQuantity = 0,
+    this.quantity_used = 0,
+    required this.availableQty,
   });
 
   // Convert JSON to MachinePart object
   factory MachinePart.fromJson(Map<String, dynamic> json) {
     return MachinePart(
-      id: json['id'],
+      part_id: json['id'],
       name: json['name'],
-      price: double.parse(json['price']),  // Convert to double
-      availableQuantity: json['quantity'],
-      company: json['company'],
+      availableQty: json['quantity'],
     );
   }
 
   // Convert list of MachineParts to required JSON structure
   static List<Map<String, dynamic>> formatPartsListForAPICall({
-    required List<MachinePart> parts,
-    required int breakdownId,
-    required int mechanicID,
+    required List<MachinePart> parts
   }) {
     return parts.map((part) {
       return {
-        "quantity_used": part.selectedQuantity,
-        "remarks": "",
-        "part": part.id,
-        "breakdown": breakdownId,
-        "company": part.company,
-        "mechanic": mechanicID
+        "part_id": part.part_id,
+        "quantity_used": part.quantity_used,
       };
     }).toList();
   }
@@ -72,6 +61,9 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
 
   @override
   Widget build(BuildContext context) {
+  final parts = widget.parts;
+  final TextEditingController _controller = TextEditingController();
+      // .where((part){return part.availableQty>0;}).toList().cast<MachinePart>();
     return  Padding(padding: EdgeInsets.all(10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -81,8 +73,8 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
                 height: 46,
                 child:MultiSelectDialogField(
                   chipDisplay: MultiSelectChipDisplay.none(),
-                  items: widget.parts
-                      .map((part) => MultiSelectItem<MachinePart>(part, part.name))
+                  items: parts
+                      .map((part) =>  MultiSelectItem<MachinePart>(part, part.name))
                       .toList(),
           title: Text("Add Parts"),
           searchable: true,
@@ -111,21 +103,43 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
               MachinePart part = selectedParts[index];
               return Padding(padding: EdgeInsets.all(5),
               child: SizedBox(height: 35,
-              child:  TextField(
+              child: Row( children: [
+                Expanded(
+                    flex: 6,
+                    child: TextField(
+                      controller: _controller,
                 style: TextStyle(fontSize: 13),
                 keyboardType: TextInputType.number,
                 onChanged: (val) {
-                  setState(() {
-                    part.selectedQuantity = int.tryParse(val) ?? 0;
-                    print("Part quantity: ${part.selectedQuantity}");
+                    if(int.parse(val)>part.availableQty){
+                      _controller.clear();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Used Quantity Can not be Greater than Available Quantity"),
+                          action: SnackBarAction(
+                            label: 'Close',
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                            },
+                          ),
+                        ),
+                      );
+                      setState(() {
+                      });
+                      return;
+                    }
+                    part.quantity_used = int.tryParse(val) ?? 0;
+                    print("Part quantity: ${part.quantity_used}");
                     widget.onSelectionChanged(selectedParts);
+                    setState(() {
                   });
                 },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   label: Text("Used qty of ${part.name}", style: TextStyle(fontSize: 13),),
                 ),
-              )));
+              )),
+              Expanded(flex:1, child: Text(" (${part.availableQty})"))])));
             }
 
         )),

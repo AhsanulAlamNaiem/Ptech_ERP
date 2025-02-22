@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 import '../../services/appResources.dart';
+import '../../services/secreatResources.dart';
 import 'interaction_widgets.dart';
 
 class AfterScanInteractionsPage extends StatefulWidget {
@@ -118,7 +118,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
 
 
       return Container(
-          height: max(365,selectedParts.length*45+50),
+          height: max(365,selectedParts.length*45+235),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -202,7 +202,9 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                       onSelectionChanged:(List<MachinePart> newSelectedParts){
                                         setState(() {
                                           selectedParts=newSelectedParts;
-                                          print("MMachineParts");
+                                          print("what");
+                                          print(selectedParts.length*45+50);
+                                          print(selectedParts.length);
                                         });
                                       }
                                   )):SizedBox(height: 0),
@@ -232,14 +234,14 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                               if(selectedCategoryIndex==-1 && machineStatus==AppMachineStatus.active){
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      backgroundColor: Colors.red,
+                                    backgroundColor: Colors.red,
                                     content: Text('No Category Selected'),
                                     duration: Duration(seconds: 1), // Show for 1 second
                                   ),
                                 );
                                 return;
                               }
-                              print("$machine \n${status}\n$strSelectedSubCategory\nwillupdatebreakdown: ${designation=='Supervisor' && status =='Active'}");
+                              print("$machine \n${status}\n$strSelectedSubCategory");
                               print("sending requests.. .");
                               updateMachineStatus(
                                 stateUpdater: (){
@@ -250,7 +252,6 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                 usedPartsQtyList: selectedParts,
                                 status: status=='Repair'?"maintenance":status!.toLowerCase(),
                                 problemIndex: selectedSubCategoryIndex,
-                                willUpdateBreakdown: designation==AppDesignations.superVisor && status=='Active',
                               );
                               setState(() {
 
@@ -285,84 +286,43 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     required Function stateUpdater,
     required String status,
     required List<MachinePart> usedPartsQtyList,
-    required int problemIndex,
-    Map breakdownBody = const {},
-    bool willUpdateBreakdown = false}) async {
+    required int problemIndex}) async {
     setState(() {
       isPatching = true;
     });
-    print("lasfjlasfjlasdfjk");
+
     final machine = Provider.of<AppProvider>(context, listen: false).machine!;
+    Map body = {};
+    final headers = {"Content-Type": "application/json"};
+    String url = "";
 
-    final currentTIme = DateTime.now().toUtc().toString().split('.').first;
-
-    Map body = {
-      "status": status,
-    };
-
-    if(designation==AppDesignations.mechanic){
+    if(designation==AppDesignations.superVisor && status == AppMachineStatus.broken){
+      body["problem_category"]=problemIndex;
+      url = "${AppApis.Machines}${machine['id']}/start_breakdown/";
+    } else if(designation==AppDesignations.mechanic && status == AppMachineStatus.maintenance){
       body["mechanic"]=userId;
-      body["last_repairing_start"]=currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z";
-    } else if(status==AppMachineStatus.broken){
-      body["last_breakdown_start"]=currentTIme.split(" ")[0] +"T" +currentTIme.split(" ")[1] +"Z";
+      url = "${AppApis.Machines}${machine['id']}/start_repair/";
+    }else if(designation==AppDesignations.superVisor && status == AppMachineStatus.active){
+      body["parts_used"]=MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList);
+      url = "${AppApis.Machines}${machine['id']}/complete_repair/";
     }
-    if(problemIndex>0){
-      body["last_problem"]=problemIndex.toString();
-    }
-
-
-    DateTime startTime = DateTime.parse("${machine['last_breakdown_start']}");
-    DateTime endTime = DateTime.parse(DateTime.now().toUtc().toString().split('.').first +'Z');
-    String formattedDuration = endTime.difference(startTime).toString().split('.').first;
-
-    final breakdownBody = {
-      "breakdown_start": "$startTime",
-      "repairing_start": "${machine['last_repairing_start']}",
-      "lost_time": formattedDuration,
-      "comments": "",
-      "machine": "${machine['id']}",
-      "mechanic": "${machine['mechanic']}",
-      "operator": "",
-      "problem_category": "${machine['last_problem']}",
-      "location": "1",
-      "line": "${machine['line']}",
-
-    };
 
     try {
-      final url = Uri.parse(AppApis.Machines + "${machine["id"]}/");
-      print(url);
-      print("Status supposed to be updated to $body");
-      final response = await http.patch(url,body: body);
-      print( " status update: ${response.statusCode} ${response.body}");
-
-      if (willUpdateBreakdown) {
-        print("breakdown supposed to be $breakdownBody");
-        final breakdownResponse =
-        await http.post(Uri.parse(AppApis.BreakDownLogs), body: breakdownBody);
-        final breakdown = jsonDecode(breakdownResponse.body);
-        print("Breakdown updated: ${breakdownResponse.statusCode} ${breakdown}");
-        if(usedPartsQtyList.isNotEmpty) {
-          final formattedPartsQtyList = jsonEncode(MachinePart.formatPartsListForAPICall(parts: usedPartsQtyList, mechanicID: machine["mechanic"], breakdownId: breakdown['id']??2));
-          print(" ok: $formattedPartsQtyList");
-          final partsResponse = await http.post(
-              Uri.parse(AppApis.bulkPartsUsage), headers: {"content-type": "application/json"}, body: formattedPartsQtyList);
-          print(" parts resp: ${partsResponse.body}");
-        }
-
-      } else {
-        print("will not Update BreakdwonLog");
-      }
-
-
+      final uriUrl = Uri.parse(url);
+      print(uriUrl);
+      print(body);
+      return;
+      final response = await http.post(uriUrl,body: jsonEncode(body), headers: headers);
+      print( "Status Update: ${response.statusCode} ${response.body}");
     } catch (e) {
       print("Error: $e");
-      final successMessage = "An error occurred while updating status.";
     }
+
+    Provider.of<AppProvider>(context, listen: false).reLoadMachineData();
     setState(() {
       isPatching = false;
     });
-    Provider.of<AppProvider>(context, listen: false).reLoadMachineData();
+    return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("Status May be Updated! Scan again to see the update."),

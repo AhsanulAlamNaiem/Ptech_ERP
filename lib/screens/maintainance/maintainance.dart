@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ptech_erp/screens/home_screen.dart';
 
 import '../../services/appResources.dart';
+import '../../services/secreatResources.dart';
 import 'breakdown.dart';
 
 class Maintanance extends StatelessWidget {
@@ -96,8 +97,7 @@ class _MachineListScreenState extends State<AllMaintainances> {
 }
 
 Future<List> fetchMachines() async {
-  final url = Uri.parse(
-      "https://machine-maintenance.ddns.net/api/maintenance/machines/");
+  final url = Uri.parse(AppApis.Machines);
 
   final response = await http.get(url);
   if (response.statusCode == 200) {

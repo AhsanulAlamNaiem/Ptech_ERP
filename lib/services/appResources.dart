@@ -135,16 +135,7 @@ class AppMachineStatus{
 }
 
 
-class AppApis{
-  static const String login = 'https://api.panamach.com/user_management/login/';
-  static const String employeeDetails = 'https://api.panamach.com/user_management/employee-details/';
-  static const String BreakDownLogs = 'https://api.panamach.com/maintenance/breakdown-logs/';
-  static const String Machines = 'https://api.panamach.com/maintenance/machines/';
-  static const String getProblemCategory = 'https://api.panamach.com/maintenance/problem-category-type/';
-  static const String getMachineParts = 'https://api.panamach.com/inventory/machineparts/';
-  static const String bulkPartsUsage = 'https://api.panamach.com/inventory/bulk-create-parts-usage/';
-  static const String singlePartsUsage = 'https://api.panamach.com/inventory/bulk-create-parts-usage/';
-}
+
 
 PreferredSize customAppBar({required String title, List<Widget>? action = null , Widget? leading = null}) {
   return PreferredSize(

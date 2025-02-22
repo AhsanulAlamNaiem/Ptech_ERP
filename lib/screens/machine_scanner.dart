@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 import 'package:vibration/vibration.dart';
 import '../services/appResources.dart';
+import '../services/secreatResources.dart';
 import 'Scanning/after_scan_page.dart';
 import 'Scanning/scanner_screen.dart';
 import 'package:http/http.dart' as http;
@@ -47,7 +48,7 @@ class _MachineScannerPageState extends State<MachineScanner> {
             child: Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, isErrorInLoadingMachineData?5:50), child: ClipRRect(
                 borderRadius: BorderRadius.circular(30),
                 child: isErrorInLoadingMachineData?
-                noDataScreen(text:"No data Found!"): (!context.watch<AppProvider>().isScanning)?  Center(child: CircularProgressIndicator()): SizedBox(
+                noDataScreen(text:"No data Found,\nor something went wrong!"): (!context.watch<AppProvider>().isScanning)?  Center(child: CircularProgressIndicator()): SizedBox(
                     width: 250,  // Set the width for the scanner
                     height: 290, // Set the height for the scanner
                     child:  MobileScanner(
@@ -83,10 +84,10 @@ class _MachineScannerPageState extends State<MachineScanner> {
     final response = await http.get(url);
 
     print(response.statusCode);
-    List<dynamic> jsonDecodedData = jsonDecode(response.body);
+    Map<String, dynamic> jsonDecodedData = jsonDecode(response.body);
 
     try {
-      Map machineObject = jsonDecodedData[0];
+      Map machineObject = jsonDecodedData['results'][0];
       print("machine Object: $machineObject");
       context.read<AppProvider>().updateMachineDatawithOutNotification(machineObject!);
       Navigator.push(context, MaterialPageRoute(builder: (context)=>AfterScanPage()));
@@ -106,7 +107,7 @@ class _MachineScannerPageState extends State<MachineScanner> {
             height: 500,
             child: Column(children: [
               Spacer(),
-              Text(text,style: AppStyles.textH2,),
+              Text(text,style: AppStyles.textH3, textAlign: TextAlign.center,),
               Spacer(),
               SizedBox(
                   width: halfScreenWidth!-halfScreenWidth!*0.05, // Set button width to 50% of screen
