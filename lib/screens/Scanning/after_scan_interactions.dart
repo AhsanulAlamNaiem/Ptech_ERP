@@ -311,21 +311,27 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
       final uriUrl = Uri.parse(url);
       print(uriUrl);
       print(body);
-      return;
+
       final response = await http.post(uriUrl,body: jsonEncode(body), headers: headers);
       print( "Status Update: ${response.statusCode} ${response.body}");
-    } catch (e) {
-      print("Error: $e");
-    }
 
     Provider.of<AppProvider>(context, listen: false).reLoadMachineData();
     setState(() {
       isPatching = false;
     });
-    return;
+    String message = "";
+    if (response.statusCode == 200 || response.statusCode==201){
+      message = "Status Updated, Scan again to see the Update!";
+    } else if (response.statusCode ==400){
+      message = "Status Updated but ${jsonDecode(response.body)['detail']}";
+    }
+
+
+
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Status May be Updated! Scan again to see the update."),
+        content: Text("$message"),
         action: SnackBarAction(
           label: 'Close',
           onPressed: () {
@@ -336,6 +342,9 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
         ),
       ),
     );
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 }
 // Function to update the machine status

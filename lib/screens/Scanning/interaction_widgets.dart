@@ -61,9 +61,7 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
 
   @override
   Widget build(BuildContext context) {
-  final parts = widget.parts;
-  final TextEditingController _controller = TextEditingController();
-      // .where((part){return part.availableQty>0;}).toList().cast<MachinePart>();
+    final parts = widget.parts;
     return  Padding(padding: EdgeInsets.all(10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -100,6 +98,7 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
                 physics: NeverScrollableScrollPhysics(),
             itemCount: selectedParts.length,
             itemBuilder: (context, index) {
+
               MachinePart part = selectedParts[index];
               return Padding(padding: EdgeInsets.all(5),
               child: SizedBox(height: 35,
@@ -107,27 +106,9 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
                 Expanded(
                     flex: 6,
                     child: TextField(
-                      controller: _controller,
                 style: TextStyle(fontSize: 13),
                 keyboardType: TextInputType.number,
                 onChanged: (val) {
-                    if(int.parse(val)>part.availableQty){
-                      _controller.clear();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Used Quantity Can not be Greater than Available Quantity"),
-                          action: SnackBarAction(
-                            label: 'Close',
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                            },
-                          ),
-                        ),
-                      );
-                      setState(() {
-                      });
-                      return;
-                    }
                     part.quantity_used = int.tryParse(val) ?? 0;
                     print("Part quantity: ${part.quantity_used}");
                     widget.onSelectionChanged(selectedParts);
@@ -136,7 +117,7 @@ class _MultiSelectPartsState extends State<MultiSelectParts> {
                 },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  label: Text("Used qty of ${part.name}", style: TextStyle(fontSize: 13),),
+                  label: Text("Used qty of ${part.name}", style: TextStyle(fontSize: 13)),
                 ),
               )),
               Expanded(flex:1, child: Text(" (${part.availableQty})"))])));
