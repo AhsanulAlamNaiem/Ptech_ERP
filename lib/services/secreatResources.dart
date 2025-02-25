@@ -7,4 +7,5 @@ class AppApis{
   static const String getMachineParts = 'https://api.panamach.com/inventory/machineparts/';
   static const String bulkPartsUsage = 'https://api.panamach.com/inventory/bulk-create-parts-usage/';
   static const String singlePartsUsage = 'https://api.panamach.com/inventory/bulk-create-parts-usage/';
+  static const String checkUserGroup = 'https://api.panamach.com/user_management/check-user-groups/';
 }

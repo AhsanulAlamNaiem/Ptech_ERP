@@ -18,6 +18,7 @@ class AfterScanInteractionsPage extends StatefulWidget {
 
 class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
   bool isPatching = false;
+  Map<String, String>? authHeaders;
   int selectedCategoryIndex = -1;
   String? selectedCategory;
   List<dynamic> problemCategories = [];
@@ -37,16 +38,39 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
   String? status;
   String? designation;
   String? userId;
+  bool canRepair = false;
+  bool canMaintenance = false;
 
+  @override
+  void initState() {
+    super.initState();
+    print("initiated");
+    fetchProblemCategories();
+    print("auth headers: $authHeaders");
+    fetchMachineStatusPermission();
+  }
 
-  Future<void> getDesignation() async {
+  Future<Map<String,String>?> getCachedData() async {
     final storage = FlutterSecureStorage();
     final newDesignation = await storage.read(key: AppSecuredKey.designation);
     final newUserId = await storage.read(key: AppSecuredKey.id);
+    final authKey = await storage.read(key: AppSecuredKey.authHeaders);
+    final authKeyJson = jsonDecode(authKey!);
+
+    final newAuthHeaders = {"cookie":authKeyJson["cookie"].toString(),
+      "Authorization": authKeyJson["Authorization"].toString()
+    };
+
+    authHeaders = newAuthHeaders;
+
+    print("auth headers: $authHeaders");
+
     userId = newUserId;
     designation = newDesignation;
-    print("Userid: $userId");
+    return authHeaders;
   }
+
+
 
   void onCategoryChange(int categoryId) {
     setState(() {
@@ -56,14 +80,6 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    print("initiated");
-    getDesignation();
-    fetchProblemCategories();
-    print("fetched");
-  }
 
   Future<void> fetchProblemCategories() async {
     try {
@@ -88,10 +104,29 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     }
   }
 
+  Future<void> fetchMachineStatusPermission() async {
+    final authHeaders = await getCachedData();
+    try {
+    print("Getting Machine Permission: $authHeaders");
+      final response = await http.get(Uri.parse(AppApis.checkUserGroup), headers: authHeaders);
+      if (response.statusCode == 200) {
+    print("Getting Machine Permission");
+        final responseJson = jsonDecode(response.body);
+        print("Machine Permission: ${responseJson}");
+        print("${responseJson["repair machine"]} ${responseJson["call maintenance"].runtimeType}");
+        setState(() {
+          canMaintenance = (responseJson["repair machine"]=='true');
+          canRepair =  responseJson["call maintenance"];
+        });
+      }
+    } catch(e){
+      print("Error\n$e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final machine = context.watch<AppProvider>().machine!;
-
     double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
 
     if (isFetchingProblemCategory) {
@@ -116,9 +151,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
         'The Machine is Broken?\nTo set it in Maintenance stage press "Set to $status" Button';
       }
 
-
       return Container(
-          height: max(365,selectedParts.length*45+235),
+          height: max(345,selectedParts.length*45+235),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -132,7 +166,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                               (status==null)?SizedBox(height: 0,): Text("$questionText!", style: AppStyles.textH3,),
 
                               SizedBox(height: 4),
-                              (status==null || designation == AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance )? const SizedBox(height: 0):  problemCategories.isEmpty
+                              !(canRepair && machineStatus == AppMachineStatus.active )? const SizedBox(height: 0):  problemCategories.isEmpty
                                   ? const CircularProgressIndicator()
                                   : Container(
                                   padding: EdgeInsets.symmetric(horizontal: 5),
@@ -161,8 +195,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                     },
                                   )),
 
-                              designation==AppDesignations.superVisor? const SizedBox(height: 5.0): const SizedBox(height: 0),
-                              (status==null || designation ==AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance )? const SizedBox(height: 0) :Container(
+                              canRepair? const SizedBox(height: 5.0): const SizedBox(height: 0),
+                              !(canRepair && machineStatus == AppMachineStatus.active)? const SizedBox(height: 0) :Container(
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -189,7 +223,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                       });
                                     },
                                   )),
-                              (status==null || designation ==AppDesignations.mechanic || machineStatus == AppMachineStatus.maintenance) && !(designation == AppDesignations.mechanic) && !(designation == AppDesignations.superVisor && machineStatus==AppMachineStatus.broken)?
+                              (canRepair && (machineStatus==AppMachineStatus.broken))?
                               isFetchingProblemCategory?
                               Center(child: CircularProgressIndicator()):
                               Container(

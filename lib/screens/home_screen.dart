@@ -42,10 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Btn("Production", ProductionPage(), Icons.factory),
           Btn("Maintenance", Maintanance(), Icons.handyman),
           Btn("Inventory", InventoryPage(),Icons.assignment),
-          ElevatedButton(onPressed: () async{
-             final value= await storage.read(key: AppSecuredKey.authHeaders);
-             print(jsonDecode(value??""));
-           }, child: Text("read"))
+          // ElevatedButton(onPressed: () async{
+          //    final value= await storage.read(key: AppSecuredKey.authHeaders);
+          //    print(jsonDecode(value??""));
+          //  }, child: Text("read"))
         ]));
     }
 
