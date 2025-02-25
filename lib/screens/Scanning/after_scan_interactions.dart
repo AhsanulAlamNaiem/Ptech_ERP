@@ -38,8 +38,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
   String? status;
   String? designation;
   String? userId;
-  bool canRepair = false;
-  bool canMaintenance = false;
+  bool canRepairTheBrokenMachine = false;
+  bool canCallToMaintenance = false;
 
   @override
   void initState() {
@@ -115,8 +115,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
         print("Machine Permission: ${responseJson}");
         print("${responseJson["repair machine"]} ${responseJson["call maintenance"].runtimeType}");
         setState(() {
-          canMaintenance = (responseJson["repair machine"]=='true');
-          canRepair =  responseJson["call maintenance"];
+          canRepairTheBrokenMachine = responseJson["repair machine"];
+          canCallToMaintenance =  responseJson["call maintenance"];
         });
       }
     } catch(e){
@@ -134,7 +134,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     } else {
       final machineStatus = machine['status'];
 
-      if (designation == AppDesignations.superVisor) {
+      if (canCallToMaintenance) {
         if (machineStatus == AppMachineStatus.active) {
           status = "Broken";
           questionText =
@@ -145,7 +145,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
           questionText =
           'Is the Machine Active now?\nif yes, at first select problem category and then press "Set to $status" Button';
         }
-      } else if (designation == AppDesignations.mechanic && machineStatus == AppMachineStatus.broken) {
+      } else if (canRepairTheBrokenMachine && machineStatus == AppMachineStatus.broken) {
         status = "Repair";
         questionText =
         'The Machine is Broken?\nTo set it in Maintenance stage press "Set to $status" Button';
@@ -166,7 +166,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                               (status==null)?SizedBox(height: 0,): Text("$questionText!", style: AppStyles.textH3,),
 
                               SizedBox(height: 4),
-                              !(canRepair && machineStatus == AppMachineStatus.active )? const SizedBox(height: 0):  problemCategories.isEmpty
+                              !(canCallToMaintenance && machineStatus == AppMachineStatus.active )? const SizedBox(height: 0):  problemCategories.isEmpty
                                   ? const CircularProgressIndicator()
                                   : Container(
                                   padding: EdgeInsets.symmetric(horizontal: 5),
@@ -195,8 +195,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                     },
                                   )),
 
-                              canRepair? const SizedBox(height: 5.0): const SizedBox(height: 0),
-                              !(canRepair && machineStatus == AppMachineStatus.active)? const SizedBox(height: 0) :Container(
+                              canRepairTheBrokenMachine? const SizedBox(height: 5.0): const SizedBox(height: 0),
+                              !(canCallToMaintenance && machineStatus == AppMachineStatus.active)? const SizedBox(height: 0) :Container(
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -223,7 +223,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                       });
                                     },
                                   )),
-                              (canRepair && (machineStatus==AppMachineStatus.broken))?
+                              (canCallToMaintenance && (machineStatus==AppMachineStatus.maintenance))?
                               isFetchingProblemCategory?
                               Center(child: CircularProgressIndicator()):
                               Container(
