@@ -231,7 +231,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                     border: Border.all(color: Colors.grey, width: 1), // Border color & width
                                     borderRadius: BorderRadius.circular(10), // Rounded corners
                                   ),
-                                  child: false? TextField(): MultiSelectParts(
+                                  chiltd: false? TextField(): MultiSelectParts(
                                       parts: parts,
                                       onSelectionChanged:(List<MachinePart> newSelectedParts){
                                         setState(() {
