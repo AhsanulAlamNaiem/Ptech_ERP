@@ -17,10 +17,7 @@ class FirebaseApi {
     // Request permissions for notifications
     await _firebaseMessaging.requestPermission();
     final fCMToken = await _firebaseMessaging.getToken();
-    print('Token: $fCMToken');
-
     final designation = await storage.read(key: AppSecuredKey.designation);
-    print("designation: $designation");
 
 
     designation==AppDesignations.mechanic?

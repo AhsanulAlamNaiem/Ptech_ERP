@@ -112,7 +112,7 @@ class AppStyles {
 
 class AppSecuredKey {
   static const Object storage = FlutterSecureStorage();
-  static const String token = 'b42b985d53c4';
+  static const String authHeaders = 'b42b985d53c4';
   static const String name = '49431de06547';
   static const String id = '4943135dte54t';
 
@@ -163,4 +163,31 @@ PreferredSize customAppBar({required String title, List<Widget>? action = null ,
 
 class AppNavigator {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+}
+
+class User{
+  final int id;
+  final String name;
+  final String designation;
+  final String department;
+  final String company;
+
+
+  const User({
+    required this.id,
+    required this.name,
+    required this.designation,
+    required this.company,
+    required this.department
+});
+
+  factory User.fromJson({required Map jsonObject}){
+    return User(
+        id: jsonObject["id"],
+        name: jsonObject["name"],
+        designation: jsonObject["designation"],
+        company: jsonObject["company"],
+      department: jsonObject["department"]
+    );
+  }
 }

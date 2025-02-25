@@ -1,12 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:provider/provider.dart';
-import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:http/http.dart' as http;
-import 'package:ptech_erp/services/app_provider.dart';
+import 'package:ptech_erp/screens/home_screen.dart';
 import 'package:ptech_erp/services/firebase_api.dart';
 import 'package:ptech_erp/services/secreatResources.dart';
-import 'dart:convert';
+
 import 'services/appResources.dart';
 
 class LogInPage extends StatefulWidget {
@@ -51,22 +51,24 @@ class _LogInPageState extends State<LogInPage> {
         print(response.body);
 
         if (response.statusCode == 200) {
-          Map employeeInfo = jsonDecode(response.body);
+          Map responseJson = jsonDecode(response.body);
+          User user = User.fromJson(jsonObject: responseJson);
+
 
           await storage.write(
-              key: AppSecuredKey.userInfoObject, value: jsonEncode(employeeInfo));
+              key: AppSecuredKey.userInfoObject, value: jsonEncode(user));
 
-          await storage.write(key: AppSecuredKey.token, value: token);
-          await storage.write(key: AppSecuredKey.name, value: employeeInfo["name"]);
+          await storage.write(key: AppSecuredKey.authHeaders, value: jsonEncode(headers));
+          await storage.write(key: AppSecuredKey.name, value: user.name);
           await storage.write(
-              key: AppSecuredKey.designation, value: employeeInfo["designation"]);
+              key: AppSecuredKey.designation, value: user.designation);
 
           await storage.write(
-              key: AppSecuredKey.department, value: employeeInfo["department"]);
+              key: AppSecuredKey.department, value: user.department);
           await storage.write(
-              key: AppSecuredKey.company, value: employeeInfo["company"]);
+              key: AppSecuredKey.company, value: user.company);
           await storage.write(
-              key: AppSecuredKey.id, value: employeeInfo['id'].toString());
+              key: AppSecuredKey.id, value: user.id.toString());
           await FirebaseApi().initNotifications();
 
 
@@ -74,7 +76,7 @@ class _LogInPageState extends State<LogInPage> {
               context: context,
               builder: (context) => AlertDialog(
                     title: Text("Login Successful"),
-                    content: Text("Welcome, ${employeeInfo["name"]}"),
+                    content: Text("Welcome, ${user.name}"),
                     actions: [
                       TextButton(
                           onPressed: () {
@@ -83,7 +85,7 @@ class _LogInPageState extends State<LogInPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => HomeScreen(
-                                          user: employeeInfo,
+                                          user: user,
                                         )));
                           },
                           child: Text("Ok"))

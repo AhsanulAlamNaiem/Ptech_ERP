@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -14,25 +16,24 @@ import 'maintainance/maintainance.dart';
 import 'notification_page.dart';
 
 class HomeScreen extends StatefulWidget {
-  Map user;
+  User user;
   HomeScreen({super.key, required this.user});
 
   @override
   _HomeScreenState createState() {
-    return _HomeScreenState(user);
+    return _HomeScreenState();
   }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final Map user;
-  _HomeScreenState(this.user);
   final storage = FlutterSecureStorage();
 
 
   @override
   Widget build(BuildContext context) {
+    final User user = widget.user;
     int _currentIndex = context.watch<AppProvider>().index;
-    final designation = user["designation"];
+    final designation = user.designation;
 
     Widget funcHomeBuilder() {
       return Padding(
@@ -41,15 +42,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Btn("Production", ProductionPage(), Icons.factory),
           Btn("Maintenance", Maintanance(), Icons.handyman),
           Btn("Inventory", InventoryPage(),Icons.assignment),
-          // ElevatedButton(onPressed: () async{
-          //    final currentDesignation= await storage.read(key: AppSecuredKey.designation);
-          //    if(currentDesignation==AppDesignations.superVisor) {
-          //       await storage.write(key: AppSecuredKey.designation,
-          //          value: AppDesignations.mechanic);
-          //    } else{
-          //      await storage.write(key: AppSecuredKey.designation, value: AppDesignations.superVisor);
-          //    }
-          //  }, child: Text("change Desg"))
+          ElevatedButton(onPressed: () async{
+             final value= await storage.read(key: AppSecuredKey.authHeaders);
+             print(jsonDecode(value??""));
+           }, child: Text("read"))
         ]));
     }
 
@@ -83,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
                 onPressed: () async {
             // Handle sign out action
-            await storage.delete(key: AppSecuredKey.token);
+            await storage.delete(key: AppSecuredKey.authHeaders);
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -147,9 +143,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )),
                         SizedBox(height: 15),
-                        Text("${user["name"]}",style: AppStyles.textH2,),
-                        Text("${user["designation"]}, ${user["department"]}"),
-                        Text("${user["company"]}",style: AppStyles.textH3,),
+                        Text("${user.name}",style: AppStyles.textH2,),
+                        Text("${user.designation}, ${user.department}"),
+                        Text("${user.company}",style: AppStyles.textH3,),
                         SizedBox(height: 15),
                         Divider(
                           color: AppColors.accentColor,      // Color of the line
