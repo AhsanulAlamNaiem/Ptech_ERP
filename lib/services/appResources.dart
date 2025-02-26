@@ -190,4 +190,15 @@ class User{
       department: jsonObject["department"]
     );
   }
+
+  Map<String, String> toJson(){
+    Map<String, String> userJson= {
+      "id": id.toString(),
+      "name": name,
+      "designation": designation,
+      "company": company,
+      "department": department,
+    };
+    return userJson;
+  }
 }

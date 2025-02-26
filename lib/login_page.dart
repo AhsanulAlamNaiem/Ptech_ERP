@@ -56,7 +56,7 @@ class _LogInPageState extends State<LogInPage> {
 
 
           await storage.write(
-              key: AppSecuredKey.userInfoObject, value: jsonEncode(user));
+              key: AppSecuredKey.userInfoObject, value: jsonEncode(user.toJson()));
 
           await storage.write(key: AppSecuredKey.authHeaders, value: jsonEncode(headers));
           await storage.write(key: AppSecuredKey.name, value: user.name);

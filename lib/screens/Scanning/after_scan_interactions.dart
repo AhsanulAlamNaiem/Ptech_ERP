@@ -34,8 +34,6 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
   bool isFetchingProblemCategory = true;
   String? successMessage;
 
-  String? questionText;
-  String? status;
   String? designation;
   String? userId;
   bool canRepairTheBrokenMachine = false;
@@ -126,6 +124,8 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    String? questionText;
+    String? status;
     final machine = context.watch<AppProvider>().machine!;
     double halfScreenWidth = MediaQuery.of(context).size.width * 0.44;
 
@@ -231,7 +231,7 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
                                     border: Border.all(color: Colors.grey, width: 1), // Border color & width
                                     borderRadius: BorderRadius.circular(10), // Rounded corners
                                   ),
-                                  chiltd: false? TextField(): MultiSelectParts(
+                                  child: false? TextField(): MultiSelectParts(
                                       parts: parts,
                                       onSelectionChanged:(List<MachinePart> newSelectedParts){
                                         setState(() {

@@ -89,7 +89,7 @@ class _SPlashScreenState extends State<SplashScreen> {
           builder: (context, snapshot) {
             Future(() {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Center (child:  CircularProgressIndicator());
               } else if (snapshot.hasData) {
                 Navigator.pushReplacement(
                     context,
