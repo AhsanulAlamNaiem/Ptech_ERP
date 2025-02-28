@@ -13,14 +13,14 @@ class FirebaseApi {
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  Future<void> initNotifications() async {
+  Future<void> initNotifications({required bool willReceiveNotification}) async {
     // Request permissions for notifications
     await _firebaseMessaging.requestPermission();
     final fCMToken = await _firebaseMessaging.getToken();
     final designation = await storage.read(key: AppSecuredKey.designation);
 
 
-    designation==AppDesignations.mechanic?
+    willReceiveNotification?
     await _firebaseMessaging.subscribeToTopic('mechanics'):
     _firebaseMessaging.unsubscribeFromTopic("mechanics");
 

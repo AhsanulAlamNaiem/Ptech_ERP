@@ -33,7 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final User user = widget.user;
     int _currentIndex = context.watch<AppProvider>().index;
-    final designation = user.designation;
+    context.read<AppProvider>().updateUser(newUser: user, willNotify: false);
+
 
     Widget funcHomeBuilder() {
       return Padding(
@@ -60,8 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
       BottomNavigationBarItem(icon: Icon(Icons.document_scanner), label: "Machine"),
 
     ];
-    print(designation);
-    if(designation==AppDesignations.mechanic){
+    print(user.designation);
+    if(user.willReceiveNotification){
+      FirebaseApi().initNotifications(willReceiveNotification: user.willReceiveNotification);
       _navigationItems.add(BottomNavigationBarItem(icon: Icon(Icons.notifications), label: "Notifications"));
     }
     return WillPopScope(

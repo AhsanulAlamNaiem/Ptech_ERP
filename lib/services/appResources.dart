@@ -171,14 +171,21 @@ class User{
   final String designation;
   final String department;
   final String company;
+  bool canRepair;
+  bool canChangeToMaintenanceStage;
+  bool willReceiveNotification;
 
 
-  const User({
+
+  User({
     required this.id,
     required this.name,
     required this.designation,
     required this.company,
-    required this.department
+    required this.department,
+    this.canRepair=false,
+    this.canChangeToMaintenanceStage=false,
+    this.willReceiveNotification=false,
 });
 
   factory User.fromJson({required Map jsonObject}){

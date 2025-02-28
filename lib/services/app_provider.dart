@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:ptech_erp/screens/Scanning/interaction_widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:ptech_erp/services/secreatResources.dart';
-import '../screens/Scanning/after_scan_page.dart';
 import 'appResources.dart';
 import 'database_helper.dart';
 
@@ -18,6 +17,14 @@ class AppProvider extends ChangeNotifier{
   int index = 0;
   String? designation;
   List<MachinePart> selectedParts = [];
+  User? currentUser;
+
+  updateUser({required User newUser, bool willNotify=true}){
+    currentUser = newUser;
+    if(willNotify) {
+      notifyListeners();
+    }
+  }
 
   updateSelectedParts({required List<MachinePart> newSelectedParts}){
     selectedParts = newSelectedParts;

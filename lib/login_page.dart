@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:ptech_erp/screens/home_screen.dart';
+import 'package:ptech_erp/services/api_services.dart';
 import 'package:ptech_erp/services/firebase_api.dart';
 import 'package:ptech_erp/services/secreatResources.dart';
 
@@ -25,58 +26,23 @@ class _LogInPageState extends State<LogInPage> {
   final TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true; // This controls password visibility
 
-  Future<void> login() async {
+  Future<void> loginFunction() async {
     setState(() {
       isLoading = true;
     });
-    final url = Uri.parse(AppApis.login);
-    final body = jsonEncode({"email": email, "password": password});
 
-    final headers = {'Content-Type': 'application/json'};
-    final response = await http.post(url, body: body, headers: headers);
+    final headers = await ApiService().loginFunction(email: email, password: password);
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final token = data['token'];
-      print("Response data: $token");
-      final cookies = response.headers['set-cookie']!.split(";");
-      final cookie = "${cookies[0]}; ${cookies[4].split(",")[1]}";
-
-      if (token != null) {
-        final employeUrl = Uri.parse(AppApis.employeeDetails);
-        final headers = {"cookie": cookie, "Authorization": "Token $token"};
-
-        print(headers);
-        final response = await http.get(employeUrl, headers: headers);
-        print(response.body);
-
-        if (response.statusCode == 200) {
-          Map responseJson = jsonDecode(response.body);
-          User user = User.fromJson(jsonObject: responseJson);
-
-
-          await storage.write(
-              key: AppSecuredKey.userInfoObject, value: jsonEncode(user.toJson()));
-
-          await storage.write(key: AppSecuredKey.authHeaders, value: jsonEncode(headers));
-          await storage.write(key: AppSecuredKey.name, value: user.name);
-          await storage.write(
-              key: AppSecuredKey.designation, value: user.designation);
-
-          await storage.write(
-              key: AppSecuredKey.department, value: user.department);
-          await storage.write(
-              key: AppSecuredKey.company, value: user.company);
-          await storage.write(
-              key: AppSecuredKey.id, value: user.id.toString());
-          await FirebaseApi().initNotifications();
-
+    if (headers!=null) {
+      final user = await ApiService().fetchUserInfoFunction(authHeaders: headers);
+      if(user!=null){
+        final User userWithAllInfo = await ApiService().fetchUserPermissions(authHeaders: headers, user: user);
 
           showDialog(
               context: context,
               builder: (context) => AlertDialog(
                     title: Text("Login Successful"),
-                    content: Text("Welcome, ${user.name}"),
+                    content: Text("Welcome, ${userWithAllInfo.name}"),
                     actions: [
                       TextButton(
                           onPressed: () {
@@ -85,23 +51,20 @@ class _LogInPageState extends State<LogInPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => HomeScreen(
-                                          user: user,
+                                          user: userWithAllInfo,
                                         )));
                           },
                           child: Text("Ok"))
                     ],
                   ));
-        } else {
+        }else {
+        showError(
+            'Failed Fetching User Info');
+      }} else {
           showError(
-              'Failed Fetching User Info\n\n ${response.body} ${response.statusCode}');
-          print(response.body);
+              'Failed Fetching User Info');
         }
-      } else {
-        showError('Failed to Login');
-      }
-    } else {
-      showError("${response.body}}");
-    }
+
     setState(() {
       isLoading = false;
     });
@@ -189,7 +152,7 @@ class _LogInPageState extends State<LogInPage> {
                   : ElevatedButton(
                     style: AppStyles.elevatedButtonStyleFullWidth,
                       onPressed: () {
-                        login();
+                        loginFunction();
                       },
                       child: Text("Login", style: TextStyle(color: Colors.white),)),
               TextButton(

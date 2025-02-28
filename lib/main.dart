@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:ptech_erp/services/api_services.dart';
 import 'package:ptech_erp/services/app_provider.dart';
 import 'package:ptech_erp/services/firebase_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -14,7 +15,7 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
-  await FirebaseApi().initNotifications();
+  await FirebaseApi().initNotifications(willReceiveNotification: false);
   runApp(const MyApp());
 }
 
@@ -59,24 +60,19 @@ class _SPlashScreenState extends State<SplashScreen> {
       final  tokenJson = jsonDecode(token);
 
       final  Map<String,String> headers = {
-        "cookie":tokenJson["cookie"],
-        "Authorization":tokenJson["Authorization"]
+        "cookie":tokenJson["cookie"].toString(),
+        "Authorization":tokenJson["Authorization"].toString()
       };
 
-      try{
-      final response = await http.get(employeUrl, headers: headers);
-      print("ok");
-      print("response ${response.body}");
-      Map responseJson = jsonDecode(response.body);
 
-      final User user = User.fromJson(jsonObject: responseJson);
-      return user;}
-      catch(e){
-      print("not ok\n\n$e");
+      final user = await ApiService().fetchUserInfoFunction(authHeaders: headers);
+      if(user!=null){
+        final userWithAllInfo = await ApiService().fetchUserPermissions(authHeaders: headers, user: user);
+        return userWithAllInfo;
+      }
+
     }
     }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
