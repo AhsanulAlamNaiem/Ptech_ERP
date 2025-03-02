@@ -37,6 +37,7 @@ class _LogInPageState extends State<LogInPage> {
       final user = await ApiService().fetchUserInfoFunction(authHeaders: headers);
       if(user!=null){
         final User userWithAllInfo = await ApiService().fetchUserPermissions(authHeaders: headers, user: user);
+        storage.write(key: AppSecuredKey.userInfoObject, value: jsonEncode(userWithAllInfo.toJson()));
 
           showDialog(
               context: context,
@@ -165,8 +166,8 @@ class _LogInPageState extends State<LogInPage> {
               // ElevatedButton(
               //     style: AppStyles.elevatedButtonStyle,
               //     onPressed: () async {
-              //       final value = await storage.read(key: securedKey);
-              //       print("$securedKey : $value");
+              //       final value = await storage.read(key: AppSecuredKey.userInfoObject);
+              //       print("Secured Objed: : $value");
               //     },
               //     child: Text("read Secure data"))
 

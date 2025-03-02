@@ -189,12 +189,16 @@ class User{
 });
 
   factory User.fromJson({required Map jsonObject}){
+    print("converting ${jsonObject["canRepair"]}");
     return User(
-        id: jsonObject["id"],
+        id: int.parse("${jsonObject["id"]}"),
         name: jsonObject["name"],
         designation: jsonObject["designation"],
         company: jsonObject["company"],
-      department: jsonObject["department"]
+      department: jsonObject["department"],
+      canRepair: bool.parse("${jsonObject["canRepair"]?? false}"),
+      willReceiveNotification: bool.parse("${jsonObject["willReceiveNotification"]??false}"),
+      canChangeToMaintenanceStage: bool.parse("${jsonObject["canChangeToMaintenanceStage"]??false}"),
     );
   }
 
@@ -205,6 +209,9 @@ class User{
       "designation": designation,
       "company": company,
       "department": department,
+      "canRepair": canRepair.toString(),
+      "canChangeToMaintenanceStage": canChangeToMaintenanceStage.toString(),
+      "willReceiveNotification": willReceiveNotification.toString(),
     };
     return userJson;
   }

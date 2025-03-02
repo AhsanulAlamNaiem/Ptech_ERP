@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Btn("Maintenance", Maintanance(), Icons.handyman),
           Btn("Inventory", InventoryPage(),Icons.assignment),
           // ElevatedButton(onPressed: () async{
-          //    final value= await storage.read(key: AppSecuredKey.authHeaders);
+          //    final value= await storage.read(key: AppSecuredKey.userInfoObject);
           //    print(jsonDecode(value??""));
           //  }, child: Text("read"))
         ]));
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
                 onPressed: () async {
             // Handle sign out action
-            await storage.delete(key: AppSecuredKey.authHeaders);
+            await storage.delete(key: AppSecuredKey.userInfoObject);
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

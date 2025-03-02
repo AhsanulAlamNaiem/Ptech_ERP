@@ -315,8 +315,6 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     }
 
 
-
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("$message"),
@@ -335,5 +333,5 @@ class _AfterScanInteractionsPageState extends State<AfterScanInteractionsPage> {
     }
   }
 }
-// Function to update the machine status
+
 

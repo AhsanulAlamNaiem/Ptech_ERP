@@ -51,7 +51,7 @@ class _SPlashScreenState extends State<SplashScreen> {
   final storage = FlutterSecureStorage();
   String? designatione;
 
-  Future<User?> loginControl() async {
+  Future<User?> tokenBasedLoginControl() async {
     final token = await storage.read(key: AppSecuredKey.authHeaders);
     print("token: $token");
 
@@ -70,9 +70,27 @@ class _SPlashScreenState extends State<SplashScreen> {
         final userWithAllInfo = await ApiService().fetchUserPermissions(authHeaders: headers, user: user);
         return userWithAllInfo;
       }
+    }
+    }
 
+  Future<User?> directCachedBasedLogin() async {
+    final userString = await storage.read(key: AppSecuredKey.userInfoObject);
+    print("token: $userString");
+
+    if (userString != null) {
+      final  userJson = jsonDecode(userString);
+      print("tokenJson: $userJson");
+    try{
+      final User user = User.fromJson(jsonObject: userJson);
+      print("user: $user");
+
+      return user;
+    }
+      catch(e){
+    print(e);
     }
     }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +99,7 @@ class _SPlashScreenState extends State<SplashScreen> {
           title: Text(""),
         ),
         body: FutureBuilder(
-          future: loginControl(),
+          future: directCachedBasedLogin(),
           builder: (context, snapshot) {
             Future(() {
               if (snapshot.connectionState == ConnectionState.waiting) {
